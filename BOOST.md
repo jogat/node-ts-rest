@@ -72,6 +72,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - `npm run start` runs the compiled app.
 - `npm run boost` prints project context.
 - `npm run boost:routes` prints route-oriented context.
+- `npm run test` runs Vitest feature tests.
 
 ## Conventions For Future Modules
 

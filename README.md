@@ -115,7 +115,7 @@ Run tests with:
 npm run test
 ```
 
-At the moment, no test runner is configured. The current script is a placeholder and exits with an error. When tests are added, this command should become the standard test entrypoint.
+Tests use Vitest and Supertest.
 
 ## Project Structure
 
@@ -247,5 +247,5 @@ npm run start         # Run compiled app from dist/
 npm run boost         # Print project context
 npm run boost:routes  # Print route registrations
 npm run boost:doctor  # Check expected project files
-npm run test          # Run tests once configured
+npm run test          # Run Vitest feature tests
 ```

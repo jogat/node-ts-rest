@@ -38,6 +38,10 @@ export class Server {
     this.app.use(errorHandler);
   }
 
+  getExpressApp(): Express {
+    return this.app;
+  }
+
   listen() {
     this.app.listen(this.port, () => {
       console.log(`[server]: Server is running at http://localhost:${this.port}`);
