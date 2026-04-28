@@ -17,6 +17,8 @@ export type CreatePostData = {
   published?: boolean;
 };
 
+export type UpdatePostData = Partial<CreatePostData>;
+
 export class Post {
   static table = "posts";
 
@@ -47,5 +49,20 @@ export class Post {
     }
 
     return post;
+  }
+
+  static async update(id: number, data: UpdatePostData): Promise<PostRow | undefined> {
+    const changes: Record<string, unknown> = {
+      ...data,
+      updated_at: db.fn.now(),
+    };
+
+    await Post.query().where({ id }).update(changes);
+
+    return Post.find(id);
+  }
+
+  static delete(id: number) {
+    return Post.query().where({ id }).delete();
   }
 }

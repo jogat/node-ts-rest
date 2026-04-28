@@ -96,6 +96,7 @@ For each route group, cover:
 - missing resource `404` responses
 - resource collection shape
 - database-backed create/read behavior where applicable
+- update/delete behavior where applicable
 
 Prefer asserting public API JSON shapes rather than internal implementation details.
 

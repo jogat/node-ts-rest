@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import { NotFoundException } from "@exceptions/NotFoundException";
-import { StorePostRequestData, ValidatedRequest } from "@http/requests";
+import { StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
 import { JsonResource, PostResource } from "@http/resources";
 import { Post } from "@models/Post";
 
 type StorePostRequest = ValidatedRequest<{
   body: StorePostRequestData;
+}>;
+
+type UpdatePostRequest = ValidatedRequest<{
+  body: UpdatePostRequestData;
 }>;
 
 export class PostController {
@@ -34,5 +38,40 @@ export class PostController {
     }
 
     res.json(PostResource.make(post).toResponse());
+  }
+
+  async update(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    const existingPost = await Post.find(id);
+
+    if (!existingPost) {
+      throw new NotFoundException("Post not found");
+    }
+
+    const data = (req as UpdatePostRequest).validated.body;
+    const post = await Post.update(id, data);
+
+    if (!post) {
+      throw new NotFoundException("Post not found");
+    }
+
+    res.json(
+      PostResource.make(post).toResponse({
+        message: "Post updated.",
+      })
+    );
+  }
+
+  async destroy(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    const existingPost = await Post.find(id);
+
+    if (!existingPost) {
+      throw new NotFoundException("Post not found");
+    }
+
+    await Post.delete(id);
+
+    res.status(204).send();
   }
 }

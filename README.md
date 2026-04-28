@@ -56,6 +56,11 @@ Current routes:
 
 ```text
 GET /              Express health/root response
+GET /ws/v1/posts   Post collection response
+POST /ws/v1/posts  Create post response
+GET /ws/v1/posts/:id
+PATCH /ws/v1/posts/:id
+DELETE /ws/v1/posts/:id
 GET /ws/v1/test    Test JSON response
 POST /ws/v1/test   Example validated JSON request
 ```
