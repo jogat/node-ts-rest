@@ -86,6 +86,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - Controllers should stay thin and return JSON responses through resources when shaping API data.
 - Middleware should be exported from `src/http/middleware/index.ts`.
 - Async controllers should be wrapped with `asyncHandler` so errors flow into `errorHandler`.
+- Route model binding should use `bindRouteModel("name", Model)` with model-like classes that expose `find(id)`.
 - New expected HTTP errors should extend `HttpException`.
 - Validation uses Zod request classes and should plug into the centralized exception handler.
 - API resources should transform internal data into public response shapes without adopting JSON:API.

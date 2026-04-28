@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import { NotFoundException } from "@exceptions/NotFoundException";
 import { ListPostsRequestData, StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
 import { JsonResource, PostResource } from "@http/resources";
-import { Post } from "@models/Post";
+import { Post, PostRow } from "@models/Post";
 
 type IndexPostRequest = ValidatedRequest<{
   query: ListPostsRequestData;
@@ -15,6 +14,12 @@ type StorePostRequest = ValidatedRequest<{
 type UpdatePostRequest = ValidatedRequest<{
   body: UpdatePostRequestData;
 }>;
+
+type BoundPostRequest = Request & {
+  models: {
+    post: PostRow;
+  };
+};
 
 export class PostController {
   async index(req: Request, res: Response) {
@@ -40,46 +45,27 @@ export class PostController {
   }
 
   async show(req: Request, res: Response) {
-    const post = await Post.find(Number(req.params.id));
-
-    if (!post) {
-      throw new NotFoundException("Post not found");
-    }
+    const post = (req as BoundPostRequest).models.post;
 
     res.json(PostResource.make(post).toResponse());
   }
 
   async update(req: Request, res: Response) {
-    const id = Number(req.params.id);
-    const existingPost = await Post.find(id);
-
-    if (!existingPost) {
-      throw new NotFoundException("Post not found");
-    }
-
+    const boundPost = (req as BoundPostRequest).models.post;
     const data = (req as UpdatePostRequest).validated.body;
-    const post = await Post.update(id, data);
-
-    if (!post) {
-      throw new NotFoundException("Post not found");
-    }
+    const post = await Post.update(boundPost.id, data);
 
     res.json(
-      PostResource.make(post).toResponse({
+      PostResource.make(post ?? boundPost).toResponse({
         message: "Post updated.",
       })
     );
   }
 
   async destroy(req: Request, res: Response) {
-    const id = Number(req.params.id);
-    const existingPost = await Post.find(id);
+    const post = (req as BoundPostRequest).models.post;
 
-    if (!existingPost) {
-      throw new NotFoundException("Post not found");
-    }
-
-    await Post.delete(id);
+    await Post.delete(post.id);
 
     res.status(204).send();
   }

@@ -221,6 +221,18 @@ describe("Post API routes", () => {
     });
   });
 
+  it("returns a JSON 404 response when updating an invalid post route param", async () => {
+    const response = await request(app).patch("/v1/posts/not-a-number").send({
+      title: "Missing",
+    });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({
+      message: "Post not found",
+      status: 404,
+    });
+  });
+
   it("deletes a post", async () => {
     const createResponse = await request(app).post("/v1/posts").send({
       title: "Delete Me",
@@ -248,6 +260,16 @@ describe("Post API routes", () => {
 
   it("returns a JSON 404 response when a post is missing", async () => {
     const response = await request(app).get("/v1/posts/999999");
+
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({
+      message: "Post not found",
+      status: 404,
+    });
+  });
+
+  it("returns a JSON 404 response when a post route param is invalid", async () => {
+    const response = await request(app).get("/v1/posts/not-a-number");
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({

@@ -57,9 +57,9 @@ Current routes:
 GET /              Express health/root response
 GET /v1/posts   Post collection response
 POST /v1/posts  Create post response
-GET /v1/posts/:id
-PATCH /v1/posts/:id
-DELETE /v1/posts/:id
+GET /v1/posts/:post
+PATCH /v1/posts/:post
+DELETE /v1/posts/:post
 GET /v1/test    Test JSON response
 POST /v1/test   Example validated JSON request
 ```
