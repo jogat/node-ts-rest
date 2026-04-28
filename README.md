@@ -48,6 +48,7 @@ Current routes:
 ```text
 GET /              Express health/root response
 GET /ws/v1/test    Test JSON response
+POST /ws/v1/test   Example validated JSON request
 ```
 
 ## Build
@@ -137,7 +138,17 @@ src/
     middleware/
       errorHandler.ts            Express error middleware
       notFound.ts                404 middleware
+      validate.ts                Zod request validation middleware
       index.ts                   Middleware exports
+    requests/
+      FormRequest.ts             Laravel-like request validation base
+      TestRequest.ts             Example request schema
+      index.ts                   Request exports
+    resources/
+      JsonResource.ts            Base API resource and collection support
+      ResourceCollection.ts      Collection export
+      TestResource.ts            Example response transformer
+      index.ts                   Resource exports
   routes/
     api.ts                       API router root
     api/
@@ -181,6 +192,52 @@ Unexpected production errors are rendered as:
 
 In development, unexpected errors include debug details.
 
+## Request Validation
+
+Request validation uses Zod behind a Laravel-like request convention.
+
+Define request schemas under `src/http/requests/`, then attach them to routes with the exported `validate` middleware:
+
+```ts
+router.post("/test", validate(TestRequest), testController.store);
+```
+
+Validated data is available on `req.validated`. Validation failures return:
+
+```json
+{
+  "message": "The given data was invalid.",
+  "status": 422,
+  "errors": {
+    "name": ["Name is required"]
+  }
+}
+```
+
+## API Resources
+
+Successful API responses can be shaped with Laravel-like resources under `src/http/resources/`.
+
+Resources transform internal data into public JSON response data:
+
+```ts
+return res.status(201).json(
+  TestResource.make({ name, fruit }).toResponse({
+    message: "Test request validated.",
+  })
+);
+```
+
+Standard resource responses use:
+
+```json
+{
+  "message": "Optional message",
+  "data": {},
+  "meta": {}
+}
+```
+
 ## Useful Commands
 
 ```bash
@@ -192,4 +249,3 @@ npm run boost:routes  # Print route registrations
 npm run boost:doctor  # Check expected project files
 npm run test          # Run tests once configured
 ```
-

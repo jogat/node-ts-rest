@@ -17,6 +17,8 @@ This project is an Express and TypeScript API shaped with Laravel-style conventi
 - `src/routes/` contains route registration.
 - `src/http/controllers/` contains controller classes.
 - `src/http/middleware/` contains Express middleware.
+- `src/http/requests/` contains Laravel-like request validation classes.
+- `src/http/resources/` contains Laravel-like API response transformers.
 - `src/exceptions/` contains Laravel-like HTTP exception handling.
 
 ## Request Pipeline
@@ -73,9 +75,10 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 
 ## Conventions For Future Modules
 
-- Controllers should stay thin and return JSON responses.
+- Controllers should stay thin and return JSON responses through resources when shaping API data.
 - Middleware should be exported from `src/http/middleware/index.ts`.
 - New expected HTTP errors should extend `HttpException`.
-- Validation, auth, and service/container features should plug into the centralized exception handler.
+- Validation uses Zod request classes and should plug into the centralized exception handler.
+- API resources should transform internal data into public response shapes without adopting JSON:API.
+- Auth and service/container features should plug into the same route and exception boundaries.
 - Keep generated JavaScript in `dist/` out of source control.
-

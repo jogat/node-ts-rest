@@ -113,6 +113,8 @@ function inferStructure(): string[] {
     "src/exceptions",
     "src/http/controllers",
     "src/http/middleware",
+    "src/http/requests",
+    "src/http/resources",
     "src/routes",
   ];
 

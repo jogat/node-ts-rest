@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import { config } from "@config/index";
 import { HttpException } from "@exceptions/HttpException";
+import { ValidationException } from "@exceptions/ValidationException";
 
 type ErrorResponse = {
   message: string;
   status: number;
   details?: unknown;
+  errors?: Record<string, string[]>;
 };
 
 export class Handler {
@@ -18,6 +20,10 @@ export class Handler {
 
     if (exception.details !== undefined) {
       response.details = exception.details;
+    }
+
+    if (exception instanceof ValidationException) {
+      response.errors = exception.errors;
     }
 
     return res.status(exception.statusCode).json(response);
