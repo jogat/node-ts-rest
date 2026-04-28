@@ -23,7 +23,6 @@ Supported variables:
 
 ```bash
 PORT=3000
-PREFIX=/ws
 NODE_ENV=development
 DB_CONNECTION=mysql2
 DB_HOST=127.0.0.1
@@ -56,13 +55,13 @@ Current routes:
 
 ```text
 GET /              Express health/root response
-GET /ws/v1/posts   Post collection response
-POST /ws/v1/posts  Create post response
-GET /ws/v1/posts/:id
-PATCH /ws/v1/posts/:id
-DELETE /ws/v1/posts/:id
-GET /ws/v1/test    Test JSON response
-POST /ws/v1/test   Example validated JSON request
+GET /v1/posts   Post collection response
+POST /v1/posts  Create post response
+GET /v1/posts/:id
+PATCH /v1/posts/:id
+DELETE /v1/posts/:id
+GET /v1/test    Test JSON response
+POST /v1/test   Example validated JSON request
 ```
 
 ## Build

@@ -6,7 +6,7 @@ const app = new Server().getExpressApp();
 
 describe("API routes", () => {
   it("returns the test JSON response", async () => {
-    const response = await request(app).get("/ws/v1/test");
+    const response = await request(app).get("/v1/test");
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -15,7 +15,7 @@ describe("API routes", () => {
   });
 
   it("returns a resource response for a valid test request", async () => {
-    const response = await request(app).post("/ws/v1/test").send({
+    const response = await request(app).post("/v1/test").send({
       name: "Josue",
       fruit: "apple",
     });
@@ -31,7 +31,7 @@ describe("API routes", () => {
   });
 
   it("returns validation errors for an invalid test request", async () => {
-    const response = await request(app).post("/ws/v1/test").send({
+    const response = await request(app).post("/v1/test").send({
       name: "",
       fruit: "",
     });
@@ -48,7 +48,7 @@ describe("API routes", () => {
   });
 
   it("returns a JSON 404 response for unknown routes", async () => {
-    const response = await request(app).get("/ws/v1/missing");
+    const response = await request(app).get("/v1/missing");
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({

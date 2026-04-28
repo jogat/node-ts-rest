@@ -19,7 +19,7 @@ describe("Post API routes", () => {
   });
 
   it("returns an empty post collection", async () => {
-    const response = await request(app).get("/ws/v1/posts");
+    const response = await request(app).get("/v1/posts");
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -36,23 +36,23 @@ describe("Post API routes", () => {
   });
 
   it("returns a paginated post collection", async () => {
-    await request(app).post("/ws/v1/posts").send({
+    await request(app).post("/v1/posts").send({
       title: "First",
       body: "First body",
       slug: "first",
     });
-    await request(app).post("/ws/v1/posts").send({
+    await request(app).post("/v1/posts").send({
       title: "Second",
       body: "Second body",
       slug: "second",
     });
-    await request(app).post("/ws/v1/posts").send({
+    await request(app).post("/v1/posts").send({
       title: "Third",
       body: "Third body",
       slug: "third",
     });
 
-    const response = await request(app).get("/ws/v1/posts?page=2&per_page=2");
+    const response = await request(app).get("/v1/posts?page=2&per_page=2");
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(1);
@@ -67,7 +67,7 @@ describe("Post API routes", () => {
   });
 
   it("returns validation errors for invalid pagination data", async () => {
-    const response = await request(app).get("/ws/v1/posts?page=0&per_page=101");
+    const response = await request(app).get("/v1/posts?page=0&per_page=101");
 
     expect(response.status).toBe(422);
     expect(response.body).toEqual({
@@ -81,7 +81,7 @@ describe("Post API routes", () => {
   });
 
   it("creates a post", async () => {
-    const response = await request(app).post("/ws/v1/posts").send({
+    const response = await request(app).post("/v1/posts").send({
       title: "Hello World",
       body: "First post body",
       slug: "hello-world",
@@ -104,13 +104,13 @@ describe("Post API routes", () => {
   });
 
   it("returns a post by id", async () => {
-    const createResponse = await request(app).post("/ws/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").send({
       title: "Find Me",
       body: "Post lookup body",
       slug: "find-me",
     });
 
-    const response = await request(app).get(`/ws/v1/posts/${createResponse.body.data.id}`);
+    const response = await request(app).get(`/v1/posts/${createResponse.body.data.id}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -125,7 +125,7 @@ describe("Post API routes", () => {
   });
 
   it("returns validation errors for invalid post data", async () => {
-    const response = await request(app).post("/ws/v1/posts").send({
+    const response = await request(app).post("/v1/posts").send({
       title: "",
       body: "",
       slug: "",
@@ -144,13 +144,13 @@ describe("Post API routes", () => {
   });
 
   it("updates a post", async () => {
-    const createResponse = await request(app).post("/ws/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").send({
       title: "Original Title",
       body: "Original body",
       slug: "original-title",
     });
 
-    const response = await request(app).patch(`/ws/v1/posts/${createResponse.body.data.id}`).send({
+    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).send({
       title: "Updated Title",
       published: true,
     });
@@ -170,13 +170,13 @@ describe("Post API routes", () => {
   });
 
   it("requires at least one field when updating a post", async () => {
-    const createResponse = await request(app).post("/ws/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").send({
       title: "Needs Changes",
       body: "Body",
       slug: "needs-changes",
     });
 
-    const response = await request(app).patch(`/ws/v1/posts/${createResponse.body.data.id}`).send({});
+    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).send({});
 
     expect(response.status).toBe(422);
     expect(response.body).toEqual({
@@ -189,13 +189,13 @@ describe("Post API routes", () => {
   });
 
   it("returns validation errors for invalid update data", async () => {
-    const createResponse = await request(app).post("/ws/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").send({
       title: "Invalid Update",
       body: "Body",
       slug: "invalid-update",
     });
 
-    const response = await request(app).patch(`/ws/v1/posts/${createResponse.body.data.id}`).send({
+    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).send({
       title: "",
     });
 
@@ -210,7 +210,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when updating a missing post", async () => {
-    const response = await request(app).patch("/ws/v1/posts/999999").send({
+    const response = await request(app).patch("/v1/posts/999999").send({
       title: "Missing",
     });
 
@@ -222,14 +222,14 @@ describe("Post API routes", () => {
   });
 
   it("deletes a post", async () => {
-    const createResponse = await request(app).post("/ws/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").send({
       title: "Delete Me",
       body: "Delete body",
       slug: "delete-me",
     });
 
-    const deleteResponse = await request(app).delete(`/ws/v1/posts/${createResponse.body.data.id}`);
-    const showResponse = await request(app).get(`/ws/v1/posts/${createResponse.body.data.id}`);
+    const deleteResponse = await request(app).delete(`/v1/posts/${createResponse.body.data.id}`);
+    const showResponse = await request(app).get(`/v1/posts/${createResponse.body.data.id}`);
 
     expect(deleteResponse.status).toBe(204);
     expect(deleteResponse.text).toBe("");
@@ -237,7 +237,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when deleting a missing post", async () => {
-    const response = await request(app).delete("/ws/v1/posts/999999");
+    const response = await request(app).delete("/v1/posts/999999");
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({
@@ -247,7 +247,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when a post is missing", async () => {
-    const response = await request(app).get("/ws/v1/posts/999999");
+    const response = await request(app).get("/v1/posts/999999");
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({

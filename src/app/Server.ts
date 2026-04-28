@@ -7,12 +7,10 @@ import { errorHandler, notFound } from "@http/middleware";
 export class Server {
   app: Express;
   port: string;
-  prefix: string;
 
   constructor() {
     this.app = express();
     this.port = config.app.port;
-    this.prefix = config.app.prefix;
 
     this.middlewares();
     this.routes();
@@ -20,7 +18,7 @@ export class Server {
   }
 
   routes() {
-    this.app.use(this.prefix, apiRouter);
+    this.app.use(apiRouter);
 
     this.app.get("/", (req: Request, res: Response) => {
       res.send("Express + TypeScript Server");
