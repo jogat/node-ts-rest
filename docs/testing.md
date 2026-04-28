@@ -95,6 +95,7 @@ For each route group, cover:
 - request validation failures
 - missing resource `404` responses
 - resource collection shape
+- pagination metadata for collection endpoints
 - database-backed create/read behavior where applicable
 - update/delete behavior where applicable
 

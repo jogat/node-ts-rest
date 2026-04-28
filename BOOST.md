@@ -89,6 +89,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - New expected HTTP errors should extend `HttpException`.
 - Validation uses Zod request classes and should plug into the centralized exception handler.
 - API resources should transform internal data into public response shapes without adopting JSON:API.
+- Paginated collections should expose metadata through the resource `meta` envelope.
 - Database access uses Knex with mysql2 for local/production and sqlite3 for tests; fields and relationships belong in migrations.
 - Model-like classes should expose explicit Knex query helpers instead of hidden ORM behavior.
 - Test conventions live in `docs/testing.md`; tests use SQLite through `NODE_ENV=test`.

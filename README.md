@@ -264,6 +264,24 @@ Standard resource responses use:
 }
 ```
 
+Collection responses can include pagination metadata:
+
+```json
+{
+  "data": [],
+  "meta": {
+    "current_page": 1,
+    "per_page": 15,
+    "total": 0,
+    "last_page": 1,
+    "from": null,
+    "to": null
+  }
+}
+```
+
+Post collections accept `page` and `per_page` query parameters.
+
 ## Database
 
 Database access uses Knex with mysql2 for local and production MySQL. Tests use a separate SQLite database. Migrations and seeders live under `src/database/`.

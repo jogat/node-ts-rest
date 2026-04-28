@@ -6,6 +6,7 @@ export {
   ValidatedRequest,
   ValidationSource,
 } from "@http/requests/FormRequest";
+export { ListPostsRequest, ListPostsRequestData, listPostsRequestSchema } from "@http/requests/ListPostsRequest";
 export { StorePostRequest, StorePostRequestData, storePostRequestSchema } from "@http/requests/StorePostRequest";
 export { TestRequest, TestRequestData, testRequestSchema } from "@http/requests/TestRequest";
 export { UpdatePostRequest, UpdatePostRequestData, updatePostRequestSchema } from "@http/requests/UpdatePostRequest";

@@ -24,6 +24,59 @@ describe("Post API routes", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       data: [],
+      meta: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1,
+        from: null,
+        to: null,
+      },
+    });
+  });
+
+  it("returns a paginated post collection", async () => {
+    await request(app).post("/ws/v1/posts").send({
+      title: "First",
+      body: "First body",
+      slug: "first",
+    });
+    await request(app).post("/ws/v1/posts").send({
+      title: "Second",
+      body: "Second body",
+      slug: "second",
+    });
+    await request(app).post("/ws/v1/posts").send({
+      title: "Third",
+      body: "Third body",
+      slug: "third",
+    });
+
+    const response = await request(app).get("/ws/v1/posts?page=2&per_page=2");
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.meta).toEqual({
+      current_page: 2,
+      per_page: 2,
+      total: 3,
+      last_page: 2,
+      from: 3,
+      to: 3,
+    });
+  });
+
+  it("returns validation errors for invalid pagination data", async () => {
+    const response = await request(app).get("/ws/v1/posts?page=0&per_page=101");
+
+    expect(response.status).toBe(422);
+    expect(response.body).toEqual({
+      message: "The given data was invalid.",
+      status: 422,
+      errors: {
+        "query.page": ["Page must be at least 1"],
+        "query.per_page": ["Per page may not be greater than 100"],
+      },
     });
   });
 

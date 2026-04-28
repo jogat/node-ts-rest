@@ -19,6 +19,23 @@ export type CreatePostData = {
 
 export type UpdatePostData = Partial<CreatePostData>;
 
+export type PaginationInput = {
+  page: number;
+  per_page: number;
+};
+
+export type PaginatedResult<T> = {
+  data: T[];
+  meta: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+    from: number | null;
+    to: number | null;
+  };
+};
+
 export class Post {
   static table = "posts";
 
@@ -28,6 +45,34 @@ export class Post {
 
   static all() {
     return Post.query().select("*").orderBy("created_at", "desc").orderBy("id", "desc");
+  }
+
+  static async paginate(input: PaginationInput): Promise<PaginatedResult<PostRow>> {
+    const page = input.page;
+    const perPage = input.per_page;
+    const offset = (page - 1) * perPage;
+    const total = await Post.count();
+    const data = await Post.query().select("*").orderBy("created_at", "desc").orderBy("id", "desc").limit(perPage).offset(offset);
+    const from = total === 0 || data.length === 0 ? null : offset + 1;
+    const to = total === 0 || data.length === 0 ? null : offset + data.length;
+
+    return {
+      data,
+      meta: {
+        current_page: page,
+        per_page: perPage,
+        total,
+        last_page: Math.max(Math.ceil(total / perPage), 1),
+        from,
+        to,
+      },
+    };
+  }
+
+  static async count(): Promise<number> {
+    const result = await Post.query().count<{ total: number | string }>("id as total").first();
+
+    return Number(result?.total ?? 0);
   }
 
   static find(id: number) {

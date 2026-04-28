@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import { NotFoundException } from "@exceptions/NotFoundException";
-import { StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
+import { ListPostsRequestData, StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
 import { JsonResource, PostResource } from "@http/resources";
 import { Post } from "@models/Post";
+
+type IndexPostRequest = ValidatedRequest<{
+  query: ListPostsRequestData;
+}>;
 
 type StorePostRequest = ValidatedRequest<{
   body: StorePostRequestData;
@@ -14,9 +18,14 @@ type UpdatePostRequest = ValidatedRequest<{
 
 export class PostController {
   async index(req: Request, res: Response) {
-    const posts = await Post.all();
+    const pagination = (req as IndexPostRequest).validated.query;
+    const posts = await Post.paginate(pagination);
 
-    res.json(JsonResource.collection(posts, PostResource).toResponse());
+    res.json(
+      JsonResource.collection(posts.data, PostResource).toResponse({
+        meta: posts.meta,
+      })
+    );
   }
 
   async store(req: Request, res: Response) {
