@@ -14,6 +14,7 @@ This project is an Express and TypeScript API shaped with Laravel-style conventi
 - `src/app.ts` boots the server.
 - `src/app/Server.ts` owns Express setup, global middleware, routes, and terminal exception middleware.
 - `src/config/` contains environment-backed app configuration.
+- `src/database/` contains Knex database connection, migrations, and seeders.
 - `src/routes/` contains route registration.
 - `src/http/controllers/` contains controller classes.
 - `src/http/middleware/` contains Express middleware.
@@ -73,6 +74,9 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - `npm run boost` prints project context.
 - `npm run boost:routes` prints route-oriented context.
 - `npm run test` runs Vitest feature tests.
+- `npm run db:migrate` runs Knex migrations.
+- `npm run db:rollback` rolls back the latest Knex migration batch.
+- `npm run db:status` lists Knex migration status.
 
 ## Conventions For Future Modules
 
@@ -81,5 +85,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - New expected HTTP errors should extend `HttpException`.
 - Validation uses Zod request classes and should plug into the centralized exception handler.
 - API resources should transform internal data into public response shapes without adopting JSON:API.
+- Database access uses Knex with mysql2; fields and relationships belong in migrations.
+- Model-like classes should expose explicit Knex query helpers instead of hidden ORM behavior.
 - Auth and service/container features should plug into the same route and exception boundaries.
 - Keep generated JavaScript in `dist/` out of source control.

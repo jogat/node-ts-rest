@@ -25,9 +25,18 @@ Supported variables:
 PORT=3000
 PREFIX=/ws
 NODE_ENV=development
+DB_CONNECTION=mysql2
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=portfolio
+DB_USERNAME=root
+DB_PASSWORD=
+TEST_DB_DATABASE=portfolio_test
 ```
 
 Defaults are defined in `src/config/app.ts`.
+
+Database conventions are documented in `docs/database.md`.
 
 ## Run Locally
 
@@ -127,7 +136,12 @@ src/
   config/
     app.ts                       App env config
     cors.ts                      CORS config
+    database.ts                  Knex database config
     index.ts                     Config export
+  database/
+    connection.ts                Shared Knex connection
+    migrations/                  Knex migration files
+    seeders/                     Knex seed files
   exceptions/
     Handler.ts                   Central error renderer
     HttpException.ts             Base HTTP exception
@@ -238,12 +252,30 @@ Standard resource responses use:
 }
 ```
 
+## Database
+
+Database access uses Knex with mysql2. Migrations and seeders live under `src/database/`.
+
+Common commands:
+
+```bash
+npm run db:make:migration create_posts_table
+npm run db:migrate
+npm run db:rollback
+npm run db:seed
+npm run db:status
+```
+
+Read `docs/database.md` before adding models, migrations, relationships, or database-backed tests.
+
 ## Useful Commands
 
 ```bash
 npm run dev           # Start development runtime
 npm run build         # Compile TypeScript and rewrite aliases
 npm run start         # Run compiled app from dist/
+npm run db:migrate    # Run Knex migrations
+npm run db:rollback   # Roll back the latest Knex migration batch
 npm run boost         # Print project context
 npm run boost:routes  # Print route registrations
 npm run boost:doctor  # Check expected project files

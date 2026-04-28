@@ -7,6 +7,11 @@
     "boost": "ts-node scripts/boost.ts about",
     "boost:doctor": "ts-node scripts/boost.ts doctor",
     "boost:routes": "ts-node scripts/boost.ts routes",
+    "db:make:migration": "knex migrate:make -x ts --knexfile knexfile.ts",
+    "db:migrate": "knex migrate:latest --knexfile knexfile.ts",
+    "db:rollback": "knex migrate:rollback --knexfile knexfile.ts",
+    "db:seed": "knex seed:run --knexfile knexfile.ts",
+    "db:status": "knex migrate:list --knexfile knexfile.ts",
     "test": "vitest run",
     "start": "node dist/app.js",
     "dev": "nodemon"
@@ -19,6 +24,8 @@
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
+    "knex": "^3.2.9",
+    "mysql2": "^3.22.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {

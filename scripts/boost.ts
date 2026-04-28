@@ -110,6 +110,9 @@ function inferStructure(): string[] {
   const directories = [
     "src/app",
     "src/config",
+    "src/database",
+    "src/database/migrations",
+    "src/database/seeders",
     "src/exceptions",
     "src/http/controllers",
     "src/http/middleware",
