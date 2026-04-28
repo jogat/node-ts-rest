@@ -31,7 +31,7 @@ DB_PORT=3306
 DB_DATABASE=portfolio
 DB_USERNAME=root
 DB_PASSWORD=
-TEST_DB_DATABASE=portfolio_test
+TEST_DB_DATABASE=./storage/testing.sqlite3
 ```
 
 Defaults are defined in `src/config/app.ts`.
@@ -126,6 +126,8 @@ npm run test
 
 Tests use Vitest and Supertest.
 
+Testing conventions are documented in `docs/testing.md`.
+
 ## Project Structure
 
 ```text
@@ -151,6 +153,7 @@ src/
       TestController.ts          Example controller
     middleware/
       errorHandler.ts            Express error middleware
+      asyncHandler.ts            Async controller error wrapper
       notFound.ts                404 middleware
       validate.ts                Zod request validation middleware
       index.ts                   Middleware exports
@@ -163,6 +166,8 @@ src/
       ResourceCollection.ts      Collection export
       TestResource.ts            Example response transformer
       index.ts                   Resource exports
+  models/
+    Post.ts                      Model-like Knex query class
   routes/
     api.ts                       API router root
     api/
@@ -175,8 +180,10 @@ Use configured aliases instead of long relative imports:
 
 ```text
 @config/*
+@database/*
 @exceptions/*
 @http/*
+@models/*
 @routes/*
 ```
 
@@ -254,7 +261,7 @@ Standard resource responses use:
 
 ## Database
 
-Database access uses Knex with mysql2. Migrations and seeders live under `src/database/`.
+Database access uses Knex with mysql2 for local and production MySQL. Tests use a separate SQLite database. Migrations and seeders live under `src/database/`.
 
 Common commands:
 
@@ -267,6 +274,8 @@ npm run db:status
 ```
 
 Read `docs/database.md` before adding models, migrations, relationships, or database-backed tests.
+
+The configured MySQL user must have access to `DB_DATABASE`. The test database is a SQLite file configured by `TEST_DB_DATABASE`.
 
 ## Useful Commands
 

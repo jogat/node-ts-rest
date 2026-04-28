@@ -22,6 +22,9 @@ pids/
 *.pid
 *.seed
 *.pid.lock
+storage/*.sqlite
+storage/*.sqlite3
+storage/*.db
 
 # Coverage and test output
 coverage/
@@ -37,4 +40,3 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
-

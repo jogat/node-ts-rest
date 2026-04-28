@@ -12,7 +12,7 @@
     "db:rollback": "knex migrate:rollback --knexfile knexfile.ts",
     "db:seed": "knex seed:run --knexfile knexfile.ts",
     "db:status": "knex migrate:list --knexfile knexfile.ts",
-    "test": "vitest run",
+    "test": "NODE_ENV=test vitest run",
     "start": "node dist/app.js",
     "dev": "nodemon"
   },
@@ -35,6 +35,7 @@
     "@types/supertest": "^7.2.0",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.14",
+    "sqlite3": "^6.0.1",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",

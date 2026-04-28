@@ -8,9 +8,12 @@ export type MysqlConnection = {
   user: string;
   password: string;
 };
+export type SqliteConnection = {
+  filename: string;
+};
 
 export type DatabaseConnectionConfig = Omit<Knex.Config, "connection"> & {
-  connection: MysqlConnection;
+  connection: MysqlConnection | SqliteConnection;
 };
 
 const environment = resolveEnvironment();
@@ -33,12 +36,30 @@ function resolveEnvironment(): DatabaseEnvironment {
 }
 
 function resolveConnection(environment: DatabaseEnvironment): DatabaseConnectionConfig {
+  if (environment === "test") {
+    return {
+      client: "sqlite3",
+      connection: {
+        filename: process.env.TEST_DB_DATABASE || process.env.DB_DATABASE_TEST || "./storage/testing.sqlite3",
+      },
+      useNullAsDefault: true,
+      migrations: {
+        directory: "./src/database/migrations",
+        extension: "ts",
+      },
+      seeds: {
+        directory: "./src/database/seeders",
+        extension: "ts",
+      },
+    };
+  }
+
   return {
     client: process.env.DB_CONNECTION || "mysql2",
     connection: {
       host: process.env.DB_HOST || "127.0.0.1",
       port: Number(process.env.DB_PORT || 3306),
-      database: resolveDatabaseName(environment),
+      database: process.env.DB_DATABASE || "portfolio",
       user: process.env.DB_USERNAME || "root",
       password: process.env.DB_PASSWORD || "",
     },
@@ -51,12 +72,4 @@ function resolveConnection(environment: DatabaseEnvironment): DatabaseConnection
       extension: "ts",
     },
   };
-}
-
-function resolveDatabaseName(environment: DatabaseEnvironment): string {
-  if (environment === "test") {
-    return process.env.TEST_DB_DATABASE || process.env.DB_DATABASE_TEST || "portfolio_test";
-  }
-
-  return process.env.DB_DATABASE || "portfolio";
 }

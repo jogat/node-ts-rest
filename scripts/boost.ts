@@ -118,6 +118,7 @@ function inferStructure(): string[] {
     "src/http/middleware",
     "src/http/requests",
     "src/http/resources",
+    "src/models",
     "src/routes",
   ];
 

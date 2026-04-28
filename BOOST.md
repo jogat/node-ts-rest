@@ -20,6 +20,7 @@ This project is an Express and TypeScript API shaped with Laravel-style conventi
 - `src/http/middleware/` contains Express middleware.
 - `src/http/requests/` contains Laravel-like request validation classes.
 - `src/http/resources/` contains Laravel-like API response transformers.
+- `src/models/` contains model-like Knex query classes.
 - `src/exceptions/` contains Laravel-like HTTP exception handling.
 
 ## Request Pipeline
@@ -60,8 +61,10 @@ In production, unexpected errors should render as:
 Use existing aliases instead of deep relative imports:
 
 - `@config/*`
+- `@database/*`
 - `@exceptions/*`
 - `@http/*`
+- `@models/*`
 - `@routes/*`
 
 When adding a new top-level concern, update both `tsconfig.json` and verify `npm run build` so `tsc-alias` rewrites compiled imports.
@@ -82,10 +85,12 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 
 - Controllers should stay thin and return JSON responses through resources when shaping API data.
 - Middleware should be exported from `src/http/middleware/index.ts`.
+- Async controllers should be wrapped with `asyncHandler` so errors flow into `errorHandler`.
 - New expected HTTP errors should extend `HttpException`.
 - Validation uses Zod request classes and should plug into the centralized exception handler.
 - API resources should transform internal data into public response shapes without adopting JSON:API.
-- Database access uses Knex with mysql2; fields and relationships belong in migrations.
+- Database access uses Knex with mysql2 for local/production and sqlite3 for tests; fields and relationships belong in migrations.
 - Model-like classes should expose explicit Knex query helpers instead of hidden ORM behavior.
+- Test conventions live in `docs/testing.md`; tests use SQLite through `NODE_ENV=test`.
 - Auth and service/container features should plug into the same route and exception boundaries.
 - Keep generated JavaScript in `dist/` out of source control.

@@ -1,6 +1,6 @@
 # Database Guide
 
-This project uses Knex with mysql2 for a Laravel-like database layer. Knex owns migrations, seeders, and query-builder access. The application keeps Express as the runtime and builds model-like classes on top of Knex instead of adopting a full ORM.
+This project uses Knex with mysql2 for local and production MySQL, and SQLite for tests. Knex owns migrations, seeders, and query-builder access. The application keeps Express as the runtime and builds model-like classes on top of Knex instead of adopting a full ORM.
 
 ## Environment Variables
 
@@ -14,10 +14,18 @@ DB_DATABASE=portfolio
 DB_USERNAME=root
 DB_PASSWORD=
 
-TEST_DB_DATABASE=portfolio_test
+TEST_DB_DATABASE=./storage/testing.sqlite3
 ```
 
-Production should use host-provided environment variables. Tests should use `portfolio_test`, not the local development database.
+Production should use host-provided environment variables. Tests use a separate SQLite database file, not the local development MySQL database.
+
+Make sure the configured MySQL user can access the local development database:
+
+```sql
+CREATE DATABASE IF NOT EXISTS portfolio;
+GRANT ALL PRIVILEGES ON portfolio.* TO 'portfolio_user'@'localhost';
+FLUSH PRIVILEGES;
+```
 
 ## Configuration
 
@@ -27,7 +35,7 @@ Knex CLI commands use `knexfile.ts`, which maps:
 
 ```text
 development -> DB_DATABASE or portfolio
-test        -> TEST_DB_DATABASE or portfolio_test
+test        -> TEST_DB_DATABASE or ./storage/testing.sqlite3
 production -> DB_DATABASE from the production environment
 ```
 
@@ -47,7 +55,7 @@ npm run db:seed
 npm run db:status
 ```
 
-Run commands against the test database with:
+Run commands against the SQLite test database with:
 
 ```bash
 NODE_ENV=test npm run db:migrate
@@ -59,7 +67,7 @@ NODE_ENV=test npm run db:rollback
 Fields are defined in migrations. Keep schema changes explicit and reversible.
 
 ```ts
-import { Knex } from "knex";
+import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("posts", (table) => {
@@ -83,7 +91,7 @@ export async function down(knex: Knex): Promise<void> {
 Relationships are defined in migrations with foreign keys. Query helpers live in model-like classes.
 
 ```ts
-import { Knex } from "knex";
+import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("comments", (table) => {
@@ -184,7 +192,7 @@ await db.transaction(async (trx) => {
 Seeders live in `src/database/seeders`.
 
 ```ts
-import { Knex } from "knex";
+import type { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
   await knex("posts").del();
@@ -199,22 +207,21 @@ export async function seed(knex: Knex): Promise<void> {
 }
 ```
 
-## Testing With MySQL
+## Testing With SQLite
 
-Tests should use the MySQL test database.
+Tests use a separate SQLite database file. The default path is `./storage/testing.sqlite3`.
 
 Recommended test flow for database-backed feature tests:
 
 ```bash
-NODE_ENV=test npm run db:migrate
 npm run test
 ```
 
-Database tests should clean up their own rows or use migrations/seeders to reset known state. Do not point tests at the development or production database.
+The `npm test` script sets `NODE_ENV=test`, and the Post feature tests run migrations before executing. Database tests should clean up their own rows or use migrations/seeders to reset known state. Do not point tests at the development or production MySQL database.
 
 ## AI Agent Notes
 
-- Use `knex` and `mysql2`; do not introduce Prisma, TypeORM, or Drizzle without a new decision.
+- Use `knex`, `mysql2` for local/production, and `sqlite3` for tests; do not introduce Prisma, TypeORM, or Drizzle without a new decision.
 - Put schema fields and foreign keys in migrations.
 - Put table query helpers in model-like classes.
 - Put request validation in `src/http/requests`.
