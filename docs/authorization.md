@@ -43,6 +43,8 @@ Recommended middleware order:
 auth -> route model binding -> authorize -> validation -> controller
 ```
 
+Routing and route parameter conventions are documented in `docs/routing.md`.
+
 ## Post Policy
 
 Current Post rules:

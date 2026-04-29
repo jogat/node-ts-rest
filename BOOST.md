@@ -87,6 +87,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - Middleware should be exported from `src/http/middleware/index.ts`.
 - Async controllers should be wrapped with `asyncHandler` so errors flow into `errorHandler`.
 - Route model binding should use `bindRouteModel("name", Model)` with model-like classes that expose `find(id)`.
+- Reusable route parameter helpers live in `src/http/requests/routeParams.ts`.
 - New expected HTTP errors should extend `HttpException`.
 - Known database constraint errors should be mapped through `DatabaseExceptionMapper`.
 - Validation uses Zod request classes and should plug into the centralized exception handler.

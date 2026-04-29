@@ -1,5 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { NotFoundException } from "@exceptions/NotFoundException";
+import { routeParams } from "@http/requests";
 
 type RouteModel<TModel> = {
   find(id: number): Promise<TModel | undefined>;
@@ -8,13 +9,13 @@ type RouteModel<TModel> = {
 export const bindRouteModel = <TModel>(name: string, model: RouteModel<TModel>): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = Number(req.params[name]);
+      const result = routeParams.positiveInteger(name).safeParse(req.params[name]);
 
-      if (!Number.isInteger(id) || id < 1) {
+      if (!result.success) {
         throw new NotFoundException(`${formatModelName(name)} not found`);
       }
 
-      const record = await model.find(id);
+      const record = await model.find(result.data);
 
       if (!record) {
         throw new NotFoundException(`${formatModelName(name)} not found`);
