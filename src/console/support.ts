@@ -45,7 +45,18 @@ export type DatabaseStatus = {
   pending: string[];
 };
 
-const root = path.resolve(__dirname, "../..");
+function resolveProjectRoot(): string {
+  const candidates = [process.cwd(), path.resolve(__dirname, ".."), path.resolve(__dirname, "../..")];
+  const root = candidates.find((candidate) => fs.existsSync(path.join(candidate, "package.json")) && fs.existsSync(path.join(candidate, "tsconfig.json")));
+
+  if (!root) {
+    throw new Error("Unable to resolve project root.");
+  }
+
+  return root;
+}
+
+const root = resolveProjectRoot();
 const srcRoot = path.join(root, "src");
 
 function readJson<T>(relativePath: string): T {
