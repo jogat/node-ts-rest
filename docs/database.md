@@ -205,6 +205,29 @@ await db.transaction(async (trx) => {
 });
 ```
 
+## Database Exceptions
+
+Known unique constraint failures are mapped by the central exception handler instead of leaking raw database errors.
+
+Current mapped conflicts:
+
+```text
+users.email -> The email has already been taken.
+posts.slug -> The slug has already been taken.
+personal_access_tokens.token_hash -> The token has already been taken.
+```
+
+Mapped conflicts return:
+
+```json
+{
+  "message": "The email has already been taken.",
+  "status": 409
+}
+```
+
+Add new known database constraint mappings in `src/exceptions/DatabaseExceptionMapper.ts`.
+
 ## Seeders
 
 Seeders live in `src/database/seeders`.
@@ -243,6 +266,7 @@ The `npm test` script sets `NODE_ENV=test`, and the Post feature tests run migra
 - Put schema fields and foreign keys in migrations.
 - Put table query helpers in model-like classes.
 - Store only hashed access tokens, not raw bearer tokens.
+- Map known database constraint errors through `DatabaseExceptionMapper`.
 - Put request validation in `src/http/requests`.
 - Put response shaping in `src/http/resources`.
 - Prefer explicit query-builder code over hidden ORM behavior.

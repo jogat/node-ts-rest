@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { config } from "@config/index";
+import { DatabaseExceptionMapper } from "@exceptions/DatabaseExceptionMapper";
 import { HttpException } from "@exceptions/HttpException";
 import { ValidationException } from "@exceptions/ValidationException";
 
@@ -11,6 +12,8 @@ type ErrorResponse = {
 };
 
 export class Handler {
+  private databaseExceptionMapper = new DatabaseExceptionMapper();
+
   render(error: unknown, req: Request, res: Response): Response {
     const exception = this.normalize(error);
     const response: ErrorResponse = {
@@ -32,6 +35,12 @@ export class Handler {
   private normalize(error: unknown): HttpException {
     if (error instanceof HttpException) {
       return error;
+    }
+
+    const databaseException = this.databaseExceptionMapper.map(error);
+
+    if (databaseException) {
+      return databaseException;
     }
 
     if (config.app.isProduction) {

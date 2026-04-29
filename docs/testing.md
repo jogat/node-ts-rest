@@ -103,6 +103,7 @@ For each route group, cover:
 - model relationship helpers where schema behavior matters
 - protected route authentication behavior where middleware groups apply
 - auth register/login/me/logout behavior
+- mapped database conflict behavior for unique constraints
 
 Prefer asserting public API JSON shapes rather than internal implementation details.
 

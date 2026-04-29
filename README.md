@@ -227,6 +227,8 @@ Unexpected production errors are rendered as:
 
 In development, unexpected errors include debug details.
 
+Known database unique constraint failures are mapped to `409` conflict responses. See `docs/database.md`.
+
 ## Request Validation
 
 Request validation uses Zod behind a Laravel-like request convention.

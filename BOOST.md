@@ -88,6 +88,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - Async controllers should be wrapped with `asyncHandler` so errors flow into `errorHandler`.
 - Route model binding should use `bindRouteModel("name", Model)` with model-like classes that expose `find(id)`.
 - New expected HTTP errors should extend `HttpException`.
+- Known database constraint errors should be mapped through `DatabaseExceptionMapper`.
 - Validation uses Zod request classes and should plug into the centralized exception handler.
 - API resources should transform internal data into public response shapes without adopting JSON:API.
 - Paginated collections should expose metadata through the resource `meta` envelope.

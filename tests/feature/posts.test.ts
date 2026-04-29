@@ -177,6 +177,26 @@ describe("Post API routes", () => {
     expect(response.body.data.updated_at).toBeNull();
   });
 
+  it("returns a conflict response when creating a post with an existing slug", async () => {
+    await request(app).post("/v1/posts").set("Authorization", authHeader).send({
+      title: "Original",
+      body: "Original body",
+      slug: "duplicate-slug",
+    });
+
+    const response = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
+      title: "Duplicate",
+      body: "Duplicate body",
+      slug: "duplicate-slug",
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toEqual({
+      message: "The slug has already been taken.",
+      status: 409,
+    });
+  });
+
   it("returns a post by id", async () => {
     const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Find Me",

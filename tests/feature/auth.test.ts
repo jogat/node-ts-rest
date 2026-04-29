@@ -67,6 +67,26 @@ describe("Auth API routes", () => {
     });
   });
 
+  it("returns a conflict response when registering with an existing email", async () => {
+    await request(app).post("/v1/auth/register").send({
+      name: "Josue",
+      email: "josue@example.com",
+      password: "password123",
+    });
+
+    const response = await request(app).post("/v1/auth/register").send({
+      name: "Other Josue",
+      email: "josue@example.com",
+      password: "password123",
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toEqual({
+      message: "The email has already been taken.",
+      status: 409,
+    });
+  });
+
   it("logs in a user and returns a bearer token", async () => {
     await User.create({
       name: "Login User",
