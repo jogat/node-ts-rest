@@ -1,4 +1,5 @@
 import { UnauthorizedException } from "@exceptions/UnauthorizedException";
+import { EventDispatcher, UserLoggedIn, UserRegistered } from "@events";
 import { LoginRequestData, RegisterRequestData } from "@http/requests";
 import { PersonalAccessToken, PersonalAccessTokenRow } from "@models/PersonalAccessToken";
 import { User, UserRow } from "@models/User";
@@ -6,6 +7,8 @@ import { hashPassword, verifyPassword } from "@support/password";
 import { createPlainAccessToken } from "@support/token";
 
 export class AuthService {
+  constructor(private readonly events = new EventDispatcher()) {}
+
   async register(data: RegisterRequestData): Promise<{ user: UserRow; token: string; token_type: "Bearer" }> {
     const user = await User.create({
       name: data.name,
@@ -20,6 +23,8 @@ export class AuthService {
       name: data.token_name,
       token_hash: plainAccessToken.tokenHash,
     });
+
+    await this.events.dispatch(new UserRegistered(user));
 
     return {
       user,
@@ -42,6 +47,8 @@ export class AuthService {
       name: data.token_name,
       token_hash: plainAccessToken.tokenHash,
     });
+
+    await this.events.dispatch(new UserLoggedIn(user));
 
     return {
       user,

@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PostService } from "@services/PostService";
 import { closeDatabaseConnection, db } from "@database/connection";
+import { EventDispatcher, PostCreated, PostUpdated } from "@events";
 import { Post } from "@models/Post";
 import { User } from "@models/User";
 import { hashPassword } from "@support/password";
@@ -42,6 +43,34 @@ describe("PostService", () => {
       slug: "service-post",
       published: 1,
     });
+  });
+
+  it("dispatches a post created event after creation", async () => {
+    const events = new EventDispatcher();
+    const handled: PostCreated[] = [];
+    const service = new PostService(events);
+    const user = await User.create({
+      name: "Post Event User",
+      email: "post-event-user@example.com",
+      password: await hashPassword("password123"),
+    });
+
+    events.listen(PostCreated, (event) => {
+      handled.push(event);
+    });
+
+    await service.create(user, {
+      title: "Event Post",
+      body: "Event body.",
+      slug: "event-post",
+    });
+
+    expect(handled).toHaveLength(1);
+    expect(handled[0].post).toMatchObject({
+      title: "Event Post",
+      slug: "event-post",
+    });
+    expect(handled[0].user.id).toBe(user.id);
   });
 
   it("lists posts with pagination metadata", async () => {
@@ -90,6 +119,37 @@ describe("PostService", () => {
       title: "Updated Title",
       body: "Updated body.",
       slug: "old-title",
+    });
+  });
+
+  it("dispatches a post updated event after update", async () => {
+    const events = new EventDispatcher();
+    const handled: PostUpdated[] = [];
+    const service = new PostService(events);
+    const user = await User.create({
+      name: "Update Event User",
+      email: "update-event-user@example.com",
+      password: await hashPassword("password123"),
+    });
+    const post = await service.create(user, {
+      title: "Before Event",
+      body: "Before body.",
+      slug: "before-event",
+    });
+
+    events.listen(PostUpdated, (event) => {
+      handled.push(event);
+    });
+
+    await service.update(post, {
+      title: "After Event",
+    });
+
+    expect(handled).toHaveLength(1);
+    expect(handled[0].previousPost.title).toBe("Before Event");
+    expect(handled[0].post.title).toBe("After Event");
+    expect(handled[0].changes).toEqual({
+      title: "After Event",
     });
   });
 

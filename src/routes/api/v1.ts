@@ -4,7 +4,10 @@ import { PostController } from "@http/controllers/PostController";
 import { TestController } from "@http/controllers/TestController";
 import { asyncHandler, auth, authorize, bindRouteModel, validate } from "@http/middleware";
 import { ListPostsRequest, LoginRequest, RegisterRequest, StorePostRequest, TestRequest, UpdatePostRequest } from "@http/requests";
+import { EventDispatcher } from "@events";
+import { registerEventListeners } from "@listeners";
 import { Post } from "@models/Post";
+import { InMemoryNotificationChannel, Notifier } from "@notifications";
 import { PostPolicy } from "@policies/PostPolicy";
 import { AuthService, PostService, ServiceContainer } from "@services";
 
@@ -12,8 +15,17 @@ const router = Router();
 const protectedRoutes = Router();
 
 const serviceContainer = new ServiceContainer();
-serviceContainer.register(AuthService, new AuthService());
-serviceContainer.register(PostService, new PostService());
+const eventDispatcher = new EventDispatcher();
+const notificationChannel = new InMemoryNotificationChannel();
+const notifier = new Notifier([notificationChannel]);
+
+registerEventListeners(eventDispatcher, notifier);
+
+serviceContainer.register(EventDispatcher, eventDispatcher);
+serviceContainer.register(InMemoryNotificationChannel, notificationChannel);
+serviceContainer.register(Notifier, notifier);
+serviceContainer.register(AuthService, new AuthService(serviceContainer.resolve(EventDispatcher)));
+serviceContainer.register(PostService, new PostService(serviceContainer.resolve(EventDispatcher)));
 
 const authController = new AuthController(serviceContainer.resolve(AuthService));
 const postController = new PostController(serviceContainer.resolve(PostService));

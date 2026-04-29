@@ -28,8 +28,11 @@ Use the container in route setup to assemble services once and inject them into 
 
 ```ts
 const serviceContainer = new ServiceContainer();
-serviceContainer.register(AuthService, new AuthService());
-serviceContainer.register(PostService, new PostService());
+const eventDispatcher = new EventDispatcher();
+
+serviceContainer.register(EventDispatcher, eventDispatcher);
+serviceContainer.register(AuthService, new AuthService(eventDispatcher));
+serviceContainer.register(PostService, new PostService(eventDispatcher));
 
 const authController = new AuthController(serviceContainer.resolve(AuthService));
 const postController = new PostController(serviceContainer.resolve(PostService));
@@ -43,6 +46,7 @@ const postController = new PostController(serviceContainer.resolve(PostService))
 - verify passwords during login
 - create personal access tokens
 - revoke tokens during logout
+- dispatch user registration and login events after successful workflows
 
 ### `PostService`
 
@@ -50,6 +54,7 @@ const postController = new PostController(serviceContainer.resolve(PostService))
 - create posts for the authenticated user
 - update posts with validated input
 - delete posts by ID
+- dispatch post creation and update events after successful writes
 
 ## Notes
 

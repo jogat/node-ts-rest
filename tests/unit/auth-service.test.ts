@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { AuthService } from "@services/AuthService";
 import { closeDatabaseConnection, db } from "@database/connection";
+import { EventDispatcher, UserLoggedIn, UserRegistered } from "@events";
 import { PersonalAccessToken } from "@models/PersonalAccessToken";
 import { User } from "@models/User";
 import { hashPassword } from "@support/password";
@@ -48,6 +49,29 @@ describe("AuthService", () => {
     });
   });
 
+  it("dispatches a user registered event after registration", async () => {
+    const events = new EventDispatcher();
+    const handled: UserRegistered[] = [];
+    const service = new AuthService(events);
+
+    events.listen(UserRegistered, (event) => {
+      handled.push(event);
+    });
+
+    await service.register({
+      name: "Event User",
+      email: "event-user@example.com",
+      password: "password123",
+      token_name: "Event Token",
+    });
+
+    expect(handled).toHaveLength(1);
+    expect(handled[0].user).toMatchObject({
+      name: "Event User",
+      email: "event-user@example.com",
+    });
+  });
+
   it("logs in with valid credentials and returns a bearer token", async () => {
     await User.create({
       name: "Login Service",
@@ -72,6 +96,33 @@ describe("AuthService", () => {
     const storedToken = await PersonalAccessToken.findByTokenHash(hashToken(result.token));
     expect(storedToken).toMatchObject({
       name: "Login Token",
+    });
+  });
+
+  it("dispatches a user logged in event after login", async () => {
+    const events = new EventDispatcher();
+    const handled: UserLoggedIn[] = [];
+    const service = new AuthService(events);
+
+    events.listen(UserLoggedIn, (event) => {
+      handled.push(event);
+    });
+
+    await User.create({
+      name: "Login Event",
+      email: "login-event@example.com",
+      password: await hashPassword("password123"),
+    });
+
+    await service.login({
+      email: "login-event@example.com",
+      password: "password123",
+      token_name: "Login Event Token",
+    });
+
+    expect(handled).toHaveLength(1);
+    expect(handled[0].user).toMatchObject({
+      email: "login-event@example.com",
     });
   });
 
