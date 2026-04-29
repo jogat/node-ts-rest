@@ -55,6 +55,15 @@ npm run db:seed
 npm run db:status
 ```
 
+The Artisan-style console exposes equivalent commands:
+
+```bash
+npm run artisan -- db status
+npm run artisan -- db migrate
+npm run artisan -- db rollback
+npm run artisan -- db seed
+```
+
 Run commands against the SQLite test database with:
 
 ```bash

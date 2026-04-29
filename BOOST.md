@@ -14,6 +14,8 @@ This project is an Express and TypeScript API shaped with Laravel-style conventi
 - `src/app.ts` boots the server.
 - `src/app/Server.ts` owns Express setup, global middleware, routes, and terminal exception middleware.
 - `src/config/` contains environment-backed app configuration.
+- `src/console/` contains the Artisan-style console entrypoint and shared console helpers.
+- `src/console/commands/` contains example command registrations.
 - `src/database/` contains Knex database connection, migrations, and seeders.
 - `src/routes/` contains route registration.
 - `src/http/controllers/` contains controller classes.
@@ -62,6 +64,7 @@ In production, unexpected errors should render as:
 Use existing aliases instead of deep relative imports:
 
 - `@config/*`
+- `@console/*`
 - `@database/*`
 - `@exceptions/*`
 - `@http/*`
@@ -79,6 +82,14 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - `npm run start` runs the compiled app.
 - `npm run boost` prints project context.
 - `npm run boost:routes` prints route-oriented context.
+- `npm run boost:doctor` prints project structure checks.
+- `npm run artisan -- about` prints the Artisan-style project overview.
+- `npm run artisan -- routes` prints discovered route registrations.
+- `npm run artisan -- doctor` runs the project structure checks.
+- `npm run artisan -- db status` prints the migration status.
+- `npm run artisan -- db migrate` runs pending migrations.
+- `npm run artisan -- db rollback` rolls back the latest migration batch.
+- `npm run artisan -- db seed` runs database seeders.
 - `npm run test` runs Vitest feature tests.
 - `npm run db:migrate` runs Knex migrations.
 - `npm run db:rollback` rolls back the latest Knex migration batch.
@@ -89,6 +100,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - Controllers should stay thin and return JSON responses through resources when shaping API data.
 - Controllers should extend the base `Controller` and use its response helpers for data, resources, collections, created responses, and no-content responses.
 - Controller actions that use `this` should be arrow properties so Express route callbacks keep the controller instance.
+- New console commands should live under `src/console/commands/` and be registered from `src/console/artisan.ts`.
 - Middleware should be exported from `src/http/middleware/index.ts`.
 - Async controllers should be wrapped with `asyncHandler` so errors flow into `errorHandler`.
 - Route model binding should use `bindRouteModel("name", Model)` with model-like classes that expose `find(id)`.

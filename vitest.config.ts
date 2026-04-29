@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@config": path.resolve(__dirname, "src/config"),
+      "@console": path.resolve(__dirname, "src/console"),
       "@database": path.resolve(__dirname, "src/database"),
       "@exceptions": path.resolve(__dirname, "src/exceptions"),
       "@http": path.resolve(__dirname, "src/http"),

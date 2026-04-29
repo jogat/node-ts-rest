@@ -39,6 +39,7 @@ Database conventions are documented in `docs/database.md`.
 Auth conventions are documented in `docs/auth.md`.
 Authorization conventions are documented in `docs/authorization.md`.
 Controller conventions are documented in `docs/controllers.md`.
+Console conventions are documented in `docs/console.md`.
 Routing conventions are documented in `docs/routing.md`.
 
 ## Run Locally
@@ -70,6 +71,19 @@ PATCH /v1/posts/:post
 DELETE /v1/posts/:post
 GET /v1/test    Test JSON response
 POST /v1/test   Example validated JSON request
+```
+
+Run console commands with:
+
+```bash
+npm run artisan -- about
+npm run artisan -- routes
+npm run artisan -- hello
+npm run artisan -- doctor
+npm run artisan -- db status
+npm run artisan -- db migrate
+npm run artisan -- db rollback
+npm run artisan -- db seed
 ```
 
 ## Build
@@ -155,6 +169,13 @@ src/
     cors.ts                      CORS config
     database.ts                  Knex database config
     index.ts                     Config export
+  console/
+    commands/
+      HelloCommand.ts            Example command registration
+      RoutesCommand.ts           Example route-listing command
+    artisan.ts                   Typed Artisan-style console entrypoint
+    output.ts                    Console output helpers
+    support.ts                   Shared console data and database helpers
   database/
     connection.ts                Shared Knex connection
     migrations/                  Knex migration files
@@ -198,6 +219,7 @@ Use configured aliases instead of long relative imports:
 
 ```text
 @config/*
+@console/*
 @database/*
 @exceptions/*
 @http/*
@@ -300,6 +322,8 @@ Collection responses can include pagination metadata:
 Post collections accept `page` and `per_page` query parameters.
 
 Controllers should extend `src/http/controllers/Controller.ts` and use the base response helpers. See `docs/controllers.md`.
+
+Console commands are documented in `docs/console.md`.
 
 ## Database
 

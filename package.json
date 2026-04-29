@@ -4,9 +4,10 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc && npx tsc-alias",
-    "boost": "ts-node scripts/boost.ts about",
-    "boost:doctor": "ts-node scripts/boost.ts doctor",
-    "boost:routes": "ts-node scripts/boost.ts routes",
+    "artisan": "ts-node -r tsconfig-paths/register src/console/artisan.ts",
+    "boost": "ts-node -r tsconfig-paths/register scripts/boost.ts about",
+    "boost:doctor": "ts-node -r tsconfig-paths/register scripts/boost.ts doctor",
+    "boost:routes": "ts-node -r tsconfig-paths/register scripts/boost.ts routes",
     "db:make:migration": "knex migrate:make -x ts --knexfile knexfile.ts",
     "db:migrate": "knex migrate:latest --knexfile knexfile.ts",
     "db:rollback": "knex migrate:rollback --knexfile knexfile.ts",
@@ -21,7 +22,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@commander-js/extra-typings": "^14.0.0",
     "bcrypt": "^6.0.0",
+    "commander": "^14.0.0",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
