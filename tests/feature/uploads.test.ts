@@ -3,10 +3,8 @@ import path from "path";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { Server } from "../../src/app/Server";
+import { accessTokenFactory, userFactory } from "../../src/database/factories";
 import { closeDatabaseConnection, db } from "../../src/database/connection";
-import { PersonalAccessToken } from "../../src/models/PersonalAccessToken";
-import { User } from "../../src/models/User";
-import { hashToken } from "../../src/support/hashToken";
 import { Storage } from "../../src/storage";
 
 const app = new Server().getExpressApp();
@@ -24,16 +22,16 @@ describe("Upload API routes", () => {
     await db("users").del();
     await fs.rm("storage/app/public/avatars", { recursive: true, force: true });
 
-    const user = await User.create({
+    const user = await userFactory.create({
       name: "Upload User",
       email: "upload@example.com",
-      password: "hashed-password",
     });
 
-    await PersonalAccessToken.create({
-      user_id: user.id,
+    await accessTokenFactory.create({
       name: "Upload Feature Test",
-      token_hash: hashToken(plainToken),
+    }, {
+      user,
+      plainTextToken: plainToken,
     });
   });
 

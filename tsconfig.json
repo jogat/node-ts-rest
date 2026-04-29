@@ -32,6 +32,7 @@
     "paths": {
       "@config/*": ["src/config/*"],
       "@console/*": ["src/console/*"],
+      "@database": ["src/database/factories/index.ts"],
       "@database/*": ["src/database/*"],
       "@events": ["src/events/index.ts"],
       "@events/*": ["src/events/*"],
