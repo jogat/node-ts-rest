@@ -43,6 +43,8 @@ storage/*.db
 
 The `storage/.gitkeep` file keeps the directory available for local test database files.
 
+Vitest runs test files sequentially because feature tests share the same SQLite database file.
+
 ## Key Files
 
 ```text
@@ -100,6 +102,7 @@ For each route group, cover:
 - update/delete behavior where applicable
 - model relationship helpers where schema behavior matters
 - protected route authentication behavior where middleware groups apply
+- auth register/login/me/logout behavior
 
 Prefer asserting public API JSON shapes rather than internal implementation details.
 

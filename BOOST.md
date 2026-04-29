@@ -96,6 +96,7 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - Auth schema uses `users` and `personal_access_tokens`; access tokens should be stored as hashes.
 - Auth conventions live in `docs/auth.md`; API clients should use bearer tokens.
 - Protected route groups should use the exported `auth` middleware.
+- Authenticated controllers can use `AuthenticatedRequest` for `req.user` and `req.accessToken`.
 - Test conventions live in `docs/testing.md`; tests use SQLite through `NODE_ENV=test`.
 - Auth and service/container features should plug into the same route and exception boundaries.
 - Keep generated JavaScript in `dist/` out of source control.

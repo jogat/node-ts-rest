@@ -56,6 +56,10 @@ Current routes:
 
 ```text
 GET /              Express health/root response
+POST /v1/auth/register
+POST /v1/auth/login
+GET /v1/auth/me
+POST /v1/auth/logout
 GET /v1/posts   Post collection response
 POST /v1/posts  Create post response
 GET /v1/posts/:post
@@ -134,6 +138,7 @@ Tests use Vitest and Supertest.
 Testing conventions are documented in `docs/testing.md`.
 
 Post routes require bearer token authentication. Test routes remain public.
+Auth routes are documented in `docs/auth.md`.
 
 ## Project Structure
 

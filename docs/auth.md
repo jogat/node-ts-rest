@@ -110,13 +110,19 @@ Middleware order should stay intentional:
 auth -> route model binding -> validation -> controller
 ```
 
-## Current Guard
+## Authenticated Request
 
-The current guard protects route groups but does not yet provide login/register endpoints. Tests create hashed tokens directly through the model-like classes.
+Protected controllers can use `AuthenticatedRequest` when the `auth` middleware is guaranteed:
 
-## Planned Endpoints
+```ts
+const { user, accessToken } = req as AuthenticatedRequest;
+```
 
-Future auth endpoints:
+The `auth` middleware attaches both `req.user` and `req.accessToken`.
+
+## Endpoints
+
+Implemented auth endpoints:
 
 ```text
 POST /v1/auth/register
@@ -126,6 +132,22 @@ GET  /v1/auth/me
 ```
 
 Post routes are protected through an auth middleware group. Test routes are public.
+
+Register and login return the plain bearer token once:
+
+```json
+{
+  "data": {
+    "user": {},
+    "token": "plain-token",
+    "token_type": "Bearer"
+  }
+}
+```
+
+`GET /v1/auth/me` returns the authenticated user resource.
+
+`POST /v1/auth/logout` revokes the current token and returns `204 No Content`.
 
 ## Future Considerations
 
