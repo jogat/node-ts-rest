@@ -18,6 +18,9 @@ export class Server {
   }
 
   routes() {
+    const publicDisk = config.storage.disks.public;
+
+    this.app.use("/storage", express.static(publicDisk.root));
     this.app.use(apiRouter);
 
     this.app.get("/", (req: Request, res: Response) => {

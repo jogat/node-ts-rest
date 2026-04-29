@@ -25,6 +25,7 @@ pids/
 storage/*.sqlite
 storage/*.sqlite3
 storage/*.db
+storage/app/
 
 # Coverage and test output
 coverage/

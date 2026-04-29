@@ -1,8 +1,10 @@
 import { Router } from "express";
+import { config } from "@config/index";
 import { AuthController } from "@http/controllers/AuthController";
 import { PostController } from "@http/controllers/PostController";
 import { TestController } from "@http/controllers/TestController";
-import { asyncHandler, auth, authorize, bindRouteModel, validate } from "@http/middleware";
+import { UploadController } from "@http/controllers/UploadController";
+import { asyncHandler, auth, authorize, bindRouteModel, uploadSingle, validate, validateUploadedFile } from "@http/middleware";
 import { ListPostsRequest, LoginRequest, RegisterRequest, StorePostRequest, TestRequest, UpdatePostRequest } from "@http/requests";
 import { EventDispatcher } from "@events";
 import { registerEventListeners } from "@listeners";
@@ -33,6 +35,7 @@ serviceContainer.register(PostService, new PostService(serviceContainer.resolve(
 const authController = new AuthController(serviceContainer.resolve(AuthService));
 const postController = new PostController(serviceContainer.resolve(PostService));
 const testController = new TestController();
+const uploadController = new UploadController();
 
 protectedRoutes.use("/posts", auth);
 protectedRoutes.get("/posts", validate(ListPostsRequest), asyncHandler(postController.index));
@@ -48,6 +51,19 @@ protectedRoutes.patch(
 protectedRoutes.delete("/posts/:post", bindRouteModel("post", Post), authorize(PostPolicy, "delete", "post"), asyncHandler(postController.destroy));
 protectedRoutes.get("/auth/me", auth, asyncHandler(authController.me));
 protectedRoutes.post("/auth/logout", auth, asyncHandler(authController.logout));
+protectedRoutes.post(
+  "/uploads/avatar",
+  auth,
+  uploadSingle("avatar"),
+  validateUploadedFile("avatar", {
+    required: true,
+    image: true,
+    mimeTypes: config.storage.upload.avatar.mimeTypes,
+    extensions: config.storage.upload.avatar.extensions,
+    maxSize: config.storage.upload.maxFileSize,
+  }),
+  asyncHandler(uploadController.storeAvatar)
+);
 
 router.post("/auth/register", validate(RegisterRequest), asyncHandler(authController.register));
 router.post("/auth/login", validate(LoginRequest), asyncHandler(authController.login));

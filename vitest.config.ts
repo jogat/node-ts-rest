@@ -19,6 +19,7 @@ export default defineConfig({
       "@queue": path.resolve(__dirname, "src/queue"),
       "@routes": path.resolve(__dirname, "src/routes"),
       "@services": path.resolve(__dirname, "src/services"),
+      "@storage": path.resolve(__dirname, "src/storage"),
       "@support": path.resolve(__dirname, "src/support"),
     },
   },

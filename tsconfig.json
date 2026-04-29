@@ -52,6 +52,8 @@
       "@routes/*": ["src/routes/*"],
       "@services": ["src/services/index.ts"],
       "@services/*": ["src/services/*"],
+      "@storage": ["src/storage/index.ts"],
+      "@storage/*": ["src/storage/*"],
       "@support/*": ["src/support/*"],
       // "@utils/*": ["src/utils/*"]
     },
