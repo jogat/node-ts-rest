@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { Controller } from "@http/controllers/Controller";
 import { AuthenticatedRequest, ListPostsRequestData, StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
 import { JsonResource, PostResource } from "@http/resources";
-import { Post, PostRow } from "@models/Post";
+import { PostRow } from "@models/Post";
+import { PostService } from "@services/PostService";
 
 type IndexPostRequest = ValidatedRequest<{
   query: ListPostsRequestData;
@@ -23,9 +24,16 @@ type BoundPostRequest = Request & {
 };
 
 export class PostController extends Controller {
+  private readonly postService: PostService;
+
+  constructor(postService: PostService) {
+    super();
+    this.postService = postService;
+  }
+
   index = async (req: Request, res: Response) => {
     const pagination = (req as IndexPostRequest).validated.query;
-    const posts = await Post.paginate(pagination);
+    const posts = await this.postService.list(pagination);
 
     return this.collection(
       res,
@@ -39,10 +47,7 @@ export class PostController extends Controller {
   store = async (req: Request, res: Response) => {
     const { user } = req as AuthenticatedRequest;
     const data = (req as StorePostRequest).validated.body;
-    const post = await Post.create({
-      user_id: user.id,
-      ...data,
-    });
+    const post = await this.postService.create(user, data);
 
     return this.createdResource(
       res,
@@ -62,7 +67,7 @@ export class PostController extends Controller {
   update = async (req: Request, res: Response) => {
     const boundPost = (req as BoundPostRequest).models.post;
     const data = (req as UpdatePostRequest).validated.body;
-    const post = await Post.update(boundPost.id, data);
+    const post = await this.postService.update(boundPost, data);
 
     return this.resource(
       res,
@@ -76,7 +81,7 @@ export class PostController extends Controller {
   destroy = async (req: Request, res: Response) => {
     const post = (req as BoundPostRequest).models.post;
 
-    await Post.delete(post.id);
+    await this.postService.delete(post);
 
     return this.noContent(res);
   };

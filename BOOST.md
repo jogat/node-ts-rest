@@ -21,6 +21,7 @@ This project is an Express and TypeScript API shaped with Laravel-style conventi
 - `src/http/requests/` contains Laravel-like request validation classes.
 - `src/http/resources/` contains Laravel-like API response transformers.
 - `src/models/` contains model-like Knex query classes.
+- `src/services/` contains application services and business workflows.
 - `src/exceptions/` contains Laravel-like HTTP exception handling.
 
 ## Request Pipeline
@@ -65,7 +66,9 @@ Use existing aliases instead of deep relative imports:
 - `@exceptions/*`
 - `@http/*`
 - `@models/*`
+- `@policies/*`
 - `@routes/*`
+- `@services/*`
 
 When adding a new top-level concern, update both `tsconfig.json` and verify `npm run build` so `tsc-alias` rewrites compiled imports.
 

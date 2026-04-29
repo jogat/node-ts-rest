@@ -6,11 +6,17 @@ import { asyncHandler, auth, authorize, bindRouteModel, validate } from "@http/m
 import { ListPostsRequest, LoginRequest, RegisterRequest, StorePostRequest, TestRequest, UpdatePostRequest } from "@http/requests";
 import { Post } from "@models/Post";
 import { PostPolicy } from "@policies/PostPolicy";
+import { AuthService, PostService, ServiceContainer } from "@services";
 
 const router = Router();
 const protectedRoutes = Router();
-const authController = new AuthController();
-const postController = new PostController();
+
+const serviceContainer = new ServiceContainer();
+serviceContainer.register(AuthService, new AuthService());
+serviceContainer.register(PostService, new PostService());
+
+const authController = new AuthController(serviceContainer.resolve(AuthService));
+const postController = new PostController(serviceContainer.resolve(PostService));
 const testController = new TestController();
 
 protectedRoutes.use("/posts", auth);
