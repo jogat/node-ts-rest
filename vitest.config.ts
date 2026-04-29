@@ -9,6 +9,7 @@ export default defineConfig({
       "@exceptions": path.resolve(__dirname, "src/exceptions"),
       "@http": path.resolve(__dirname, "src/http"),
       "@models": path.resolve(__dirname, "src/models"),
+      "@policies": path.resolve(__dirname, "src/policies"),
       "@routes": path.resolve(__dirname, "src/routes"),
       "@support": path.resolve(__dirname, "src/support"),
     },

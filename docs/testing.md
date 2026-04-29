@@ -102,6 +102,7 @@ For each route group, cover:
 - update/delete behavior where applicable
 - model relationship helpers where schema behavior matters
 - protected route authentication behavior where middleware groups apply
+- policy authorization behavior for protected owner-only actions
 - auth register/login/me/logout behavior
 - mapped database conflict behavior for unique constraints
 

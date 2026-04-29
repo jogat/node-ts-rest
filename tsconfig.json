@@ -35,6 +35,7 @@
       "@exceptions/*": ["src/exceptions/*"],
       "@http/*": ["src/http/*"],
       "@models/*": ["src/models/*"],
+      "@policies/*": ["src/policies/*"],
       "@routes/*": ["src/routes/*"],
       "@support/*": ["src/support/*"],
       // "@utils/*": ["src/utils/*"]

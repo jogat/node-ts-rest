@@ -37,6 +37,7 @@ Defaults are defined in `src/config/app.ts`.
 
 Database conventions are documented in `docs/database.md`.
 Auth conventions are documented in `docs/auth.md`.
+Authorization conventions are documented in `docs/authorization.md`.
 
 ## Run Locally
 

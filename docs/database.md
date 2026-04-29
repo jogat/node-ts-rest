@@ -133,6 +133,8 @@ personal_access_tokens belongs to user
 
 The token table stores `token_hash`, never a raw plain-text token.
 
+Post ownership is represented by `posts.user_id`, which references `users.id`.
+
 ## Model-Like Classes
 
 Keep model-like classes thin and explicit. They should centralize table names and common queries without hiding Knex.

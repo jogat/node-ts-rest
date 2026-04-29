@@ -3,6 +3,7 @@ import { JsonResource } from "@http/resources/JsonResource";
 
 export type PostResourceData = {
   id: number;
+  user_id: number | null;
   title: string;
   body: string;
   slug: string;
@@ -15,6 +16,7 @@ export class PostResource extends JsonResource<PostRow, PostResourceData> {
   toArray(): PostResourceData {
     return {
       id: this.resource.id,
+      user_id: this.resource.user_id,
       title: this.resource.title,
       body: this.resource.body,
       slug: this.resource.slug,

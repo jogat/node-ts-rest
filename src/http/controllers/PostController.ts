@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ListPostsRequestData, StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
+import { AuthenticatedRequest, ListPostsRequestData, StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
 import { JsonResource, PostResource } from "@http/resources";
 import { Post, PostRow } from "@models/Post";
 
@@ -34,8 +34,12 @@ export class PostController {
   }
 
   async store(req: Request, res: Response) {
+    const { user } = req as AuthenticatedRequest;
     const data = (req as StorePostRequest).validated.body;
-    const post = await Post.create(data);
+    const post = await Post.create({
+      user_id: user.id,
+      ...data,
+    });
 
     res.status(201).json(
       PostResource.make(post).toResponse({

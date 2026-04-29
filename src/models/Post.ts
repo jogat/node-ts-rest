@@ -2,6 +2,7 @@ import { db } from "@database/connection";
 
 export type PostRow = {
   id: number;
+  user_id: number | null;
   title: string;
   body: string;
   slug: string;
@@ -11,6 +12,7 @@ export type PostRow = {
 };
 
 export type CreatePostData = {
+  user_id: number;
   title: string;
   body: string;
   slug: string;
@@ -81,6 +83,7 @@ export class Post {
 
   static async create(data: CreatePostData): Promise<PostRow> {
     const [id] = await Post.query().insert({
+      user_id: data.user_id,
       title: data.title,
       body: data.body,
       slug: data.slug,

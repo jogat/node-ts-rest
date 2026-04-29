@@ -9,6 +9,7 @@ import { hashToken } from "../../src/support/hashToken";
 const app = new Server().getExpressApp();
 const plainToken = "test-token";
 const authHeader = `Bearer ${plainToken}`;
+let authenticatedUserId: number;
 
 describe("Post API routes", () => {
   beforeAll(async () => {
@@ -24,6 +25,7 @@ describe("Post API routes", () => {
       email: "user@example.com",
       password: "hashed-password",
     });
+    authenticatedUserId = user.id;
 
     await PersonalAccessToken.create({
       user_id: user.id,
@@ -166,6 +168,7 @@ describe("Post API routes", () => {
     expect(response.body).toMatchObject({
       message: "Post created.",
       data: {
+        user_id: authenticatedUserId,
         title: "Hello World",
         body: "First post body",
         slug: "hello-world",
@@ -210,6 +213,7 @@ describe("Post API routes", () => {
     expect(response.body).toMatchObject({
       data: {
         id: createResponse.body.data.id,
+        user_id: authenticatedUserId,
         title: "Find Me",
         body: "Post lookup body",
         slug: "find-me",
@@ -257,6 +261,7 @@ describe("Post API routes", () => {
       message: "Post updated.",
       data: {
         id: createResponse.body.data.id,
+        user_id: authenticatedUserId,
         title: "Updated Title",
         body: "Original body",
         slug: "original-title",
@@ -318,6 +323,30 @@ describe("Post API routes", () => {
     });
   });
 
+  it("returns a JSON 403 response when updating another user's post", async () => {
+    const otherUser = await User.create({
+      name: "Other User",
+      email: "other@example.com",
+      password: "hashed-password",
+    });
+    const [postId] = await db("posts").insert({
+      user_id: otherUser.id,
+      title: "Other Post",
+      body: "Other body",
+      slug: "other-post",
+    });
+
+    const response = await request(app).patch(`/v1/posts/${postId}`).set("Authorization", authHeader).send({
+      title: "Not Allowed",
+    });
+
+    expect(response.status).toBe(403);
+    expect(response.body).toEqual({
+      message: "This action is unauthorized.",
+      status: 403,
+    });
+  });
+
   it("returns a JSON 404 response when updating an invalid post route param", async () => {
     const response = await request(app).patch("/v1/posts/not-a-number").set("Authorization", authHeader).send({
       title: "Missing",
@@ -352,6 +381,28 @@ describe("Post API routes", () => {
     expect(response.body).toEqual({
       message: "Post not found",
       status: 404,
+    });
+  });
+
+  it("returns a JSON 403 response when deleting another user's post", async () => {
+    const otherUser = await User.create({
+      name: "Delete Other User",
+      email: "delete-other@example.com",
+      password: "hashed-password",
+    });
+    const [postId] = await db("posts").insert({
+      user_id: otherUser.id,
+      title: "Delete Other Post",
+      body: "Other body",
+      slug: "delete-other-post",
+    });
+
+    const response = await request(app).delete(`/v1/posts/${postId}`).set("Authorization", authHeader);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toEqual({
+      message: "This action is unauthorized.",
+      status: 403,
     });
   });
 
