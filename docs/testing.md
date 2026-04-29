@@ -99,6 +99,7 @@ For each route group, cover:
 - database-backed create/read behavior where applicable
 - update/delete behavior where applicable
 - model relationship helpers where schema behavior matters
+- protected route authentication behavior where middleware groups apply
 
 Prefer asserting public API JSON shapes rather than internal implementation details.
 

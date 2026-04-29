@@ -10,6 +10,7 @@ export default defineConfig({
       "@http": path.resolve(__dirname, "src/http"),
       "@models": path.resolve(__dirname, "src/models"),
       "@routes": path.resolve(__dirname, "src/routes"),
+      "@support": path.resolve(__dirname, "src/support"),
     },
   },
   test: {

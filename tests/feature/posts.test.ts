@@ -2,8 +2,13 @@ import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { Server } from "../../src/app/Server";
 import { closeDatabaseConnection, db } from "../../src/database/connection";
+import { PersonalAccessToken } from "../../src/models/PersonalAccessToken";
+import { User } from "../../src/models/User";
+import { hashToken } from "../../src/support/hashToken";
 
 const app = new Server().getExpressApp();
+const plainToken = "test-token";
+const authHeader = `Bearer ${plainToken}`;
 
 describe("Post API routes", () => {
   beforeAll(async () => {
@@ -12,6 +17,19 @@ describe("Post API routes", () => {
 
   beforeEach(async () => {
     await db("posts").del();
+    await db("personal_access_tokens").del();
+    await db("users").del();
+    const user = await User.create({
+      name: "Test User",
+      email: "user@example.com",
+      password: "hashed-password",
+    });
+
+    await PersonalAccessToken.create({
+      user_id: user.id,
+      name: "Feature Test",
+      token_hash: hashToken(plainToken),
+    });
   });
 
   afterAll(async () => {
@@ -19,7 +37,7 @@ describe("Post API routes", () => {
   });
 
   it("returns an empty post collection", async () => {
-    const response = await request(app).get("/v1/posts");
+    const response = await request(app).get("/v1/posts").set("Authorization", authHeader);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -35,24 +53,80 @@ describe("Post API routes", () => {
     });
   });
 
+  it("requires authentication for post routes", async () => {
+    const response = await request(app).get("/v1/posts");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({
+      message: "Unauthenticated.",
+      status: 401,
+    });
+  });
+
+  it("rejects invalid bearer tokens", async () => {
+    const response = await request(app).get("/v1/posts").set("Authorization", "Bearer invalid-token");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({
+      message: "Unauthenticated.",
+      status: 401,
+    });
+  });
+
+  it("rejects revoked bearer tokens", async () => {
+    const token = await PersonalAccessToken.findByTokenHash(hashToken(plainToken));
+
+    await PersonalAccessToken.revoke(token!.id);
+
+    const response = await request(app).get("/v1/posts").set("Authorization", authHeader);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({
+      message: "Unauthenticated.",
+      status: 401,
+    });
+  });
+
+  it("rejects expired bearer tokens", async () => {
+    await db("personal_access_tokens").where({ token_hash: hashToken(plainToken) }).update({
+      expires_at: "2000-01-01 00:00:00",
+    });
+
+    const response = await request(app).get("/v1/posts").set("Authorization", authHeader);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({
+      message: "Unauthenticated.",
+      status: 401,
+    });
+  });
+
+  it("updates token last_used_at after successful authentication", async () => {
+    const response = await request(app).get("/v1/posts").set("Authorization", authHeader);
+    const token = await PersonalAccessToken.findByTokenHash(hashToken(plainToken));
+
+    expect(response.status).toBe(200);
+    expect(token?.last_used_at).toBeTruthy();
+  });
+
   it("returns a paginated post collection", async () => {
-    await request(app).post("/v1/posts").send({
+    await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "First",
       body: "First body",
       slug: "first",
     });
-    await request(app).post("/v1/posts").send({
+    await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Second",
       body: "Second body",
       slug: "second",
     });
-    await request(app).post("/v1/posts").send({
+    await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Third",
       body: "Third body",
       slug: "third",
     });
 
-    const response = await request(app).get("/v1/posts?page=2&per_page=2");
+    const response = await request(app).get("/v1/posts?page=2&per_page=2").set("Authorization", authHeader);
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(1);
@@ -67,7 +141,7 @@ describe("Post API routes", () => {
   });
 
   it("returns validation errors for invalid pagination data", async () => {
-    const response = await request(app).get("/v1/posts?page=0&per_page=101");
+    const response = await request(app).get("/v1/posts?page=0&per_page=101").set("Authorization", authHeader);
 
     expect(response.status).toBe(422);
     expect(response.body).toEqual({
@@ -81,7 +155,7 @@ describe("Post API routes", () => {
   });
 
   it("creates a post", async () => {
-    const response = await request(app).post("/v1/posts").send({
+    const response = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Hello World",
       body: "First post body",
       slug: "hello-world",
@@ -104,13 +178,13 @@ describe("Post API routes", () => {
   });
 
   it("returns a post by id", async () => {
-    const createResponse = await request(app).post("/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Find Me",
       body: "Post lookup body",
       slug: "find-me",
     });
 
-    const response = await request(app).get(`/v1/posts/${createResponse.body.data.id}`);
+    const response = await request(app).get(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -125,7 +199,7 @@ describe("Post API routes", () => {
   });
 
   it("returns validation errors for invalid post data", async () => {
-    const response = await request(app).post("/v1/posts").send({
+    const response = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "",
       body: "",
       slug: "",
@@ -144,16 +218,19 @@ describe("Post API routes", () => {
   });
 
   it("updates a post", async () => {
-    const createResponse = await request(app).post("/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Original Title",
       body: "Original body",
       slug: "original-title",
     });
 
-    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).send({
-      title: "Updated Title",
-      published: true,
-    });
+    const response = await request(app)
+      .patch(`/v1/posts/${createResponse.body.data.id}`)
+      .set("Authorization", authHeader)
+      .send({
+        title: "Updated Title",
+        published: true,
+      });
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -170,13 +247,13 @@ describe("Post API routes", () => {
   });
 
   it("requires at least one field when updating a post", async () => {
-    const createResponse = await request(app).post("/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Needs Changes",
       body: "Body",
       slug: "needs-changes",
     });
 
-    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).send({});
+    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader).send({});
 
     expect(response.status).toBe(422);
     expect(response.body).toEqual({
@@ -189,13 +266,13 @@ describe("Post API routes", () => {
   });
 
   it("returns validation errors for invalid update data", async () => {
-    const createResponse = await request(app).post("/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Invalid Update",
       body: "Body",
       slug: "invalid-update",
     });
 
-    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).send({
+    const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader).send({
       title: "",
     });
 
@@ -210,7 +287,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when updating a missing post", async () => {
-    const response = await request(app).patch("/v1/posts/999999").send({
+    const response = await request(app).patch("/v1/posts/999999").set("Authorization", authHeader).send({
       title: "Missing",
     });
 
@@ -222,7 +299,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when updating an invalid post route param", async () => {
-    const response = await request(app).patch("/v1/posts/not-a-number").send({
+    const response = await request(app).patch("/v1/posts/not-a-number").set("Authorization", authHeader).send({
       title: "Missing",
     });
 
@@ -234,14 +311,14 @@ describe("Post API routes", () => {
   });
 
   it("deletes a post", async () => {
-    const createResponse = await request(app).post("/v1/posts").send({
+    const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Delete Me",
       body: "Delete body",
       slug: "delete-me",
     });
 
-    const deleteResponse = await request(app).delete(`/v1/posts/${createResponse.body.data.id}`);
-    const showResponse = await request(app).get(`/v1/posts/${createResponse.body.data.id}`);
+    const deleteResponse = await request(app).delete(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader);
+    const showResponse = await request(app).get(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader);
 
     expect(deleteResponse.status).toBe(204);
     expect(deleteResponse.text).toBe("");
@@ -249,7 +326,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when deleting a missing post", async () => {
-    const response = await request(app).delete("/v1/posts/999999");
+    const response = await request(app).delete("/v1/posts/999999").set("Authorization", authHeader);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({
@@ -259,7 +336,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when a post is missing", async () => {
-    const response = await request(app).get("/v1/posts/999999");
+    const response = await request(app).get("/v1/posts/999999").set("Authorization", authHeader);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({
@@ -269,7 +346,7 @@ describe("Post API routes", () => {
   });
 
   it("returns a JSON 404 response when a post route param is invalid", async () => {
-    const response = await request(app).get("/v1/posts/not-a-number");
+    const response = await request(app).get("/v1/posts/not-a-number").set("Authorization", authHeader);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({

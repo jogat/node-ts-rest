@@ -88,7 +88,7 @@ function printList(items: string[], emptyMessage = "None found."): void {
 
 function parseRoutes(): RouteEntry[] {
   const routeFiles = collectFiles(path.join(srcRoot, "routes"), ".ts");
-  const routePattern = /router\.(get|post|put|patch|delete|options|head|all|use)\(\s*["'`]([^"'`]+)["'`]/g;
+  const routePattern = /\b\w+\.(get|post|put|patch|delete|options|head|all|use)\(\s*["'`]([^"'`]+)["'`]/g;
 
   return routeFiles.flatMap((file) => {
     const contents = fs.readFileSync(file, "utf8");

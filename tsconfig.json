@@ -36,6 +36,7 @@
       "@http/*": ["src/http/*"],
       "@models/*": ["src/models/*"],
       "@routes/*": ["src/routes/*"],
+      "@support/*": ["src/support/*"],
       // "@utils/*": ["src/utils/*"]
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

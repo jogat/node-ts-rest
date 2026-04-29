@@ -71,7 +71,7 @@ Flutter Android
 
 ## Request Flow
 
-Planned `auth` middleware flow:
+Implemented `auth` middleware flow:
 
 1. Read `Authorization` header.
 2. Require `Bearer <token>`.
@@ -79,7 +79,7 @@ Planned `auth` middleware flow:
 4. Find `personal_access_tokens.token_hash`.
 5. Reject revoked or expired tokens.
 6. Load the owning user.
-7. Attach authenticated user/token context to the request.
+7. Attach authenticated user/token context to the request as `req.user` and `req.accessToken`.
 8. Continue to the protected route.
 
 Unauthenticated responses should use:
@@ -110,6 +110,10 @@ Middleware order should stay intentional:
 auth -> route model binding -> validation -> controller
 ```
 
+## Current Guard
+
+The current guard protects route groups but does not yet provide login/register endpoints. Tests create hashed tokens directly through the model-like classes.
+
 ## Planned Endpoints
 
 Future auth endpoints:
@@ -121,7 +125,7 @@ POST /v1/auth/logout
 GET  /v1/auth/me
 ```
 
-The first implementation should protect Post routes through an auth middleware group while leaving public/test routes public.
+Post routes are protected through an auth middleware group. Test routes are public.
 
 ## Future Considerations
 

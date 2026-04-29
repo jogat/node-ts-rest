@@ -133,6 +133,8 @@ Tests use Vitest and Supertest.
 
 Testing conventions are documented in `docs/testing.md`.
 
+Post routes require bearer token authentication. Test routes remain public.
+
 ## Project Structure
 
 ```text
