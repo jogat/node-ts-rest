@@ -36,6 +36,7 @@ TEST_DB_DATABASE=./storage/testing.sqlite3
 Defaults are defined in `src/config/app.ts`.
 
 Database conventions are documented in `docs/database.md`.
+Auth conventions are documented in `docs/auth.md`.
 
 ## Run Locally
 
@@ -171,7 +172,9 @@ src/
       TestResource.ts            Example response transformer
       index.ts                   Resource exports
   models/
+    PersonalAccessToken.ts       Token model-like query class
     Post.ts                      Model-like Knex query class
+    User.ts                      User model-like query class
   routes/
     api.ts                       API router root
     api/

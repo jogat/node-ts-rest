@@ -93,6 +93,8 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 - Paginated collections should expose metadata through the resource `meta` envelope.
 - Database access uses Knex with mysql2 for local/production and sqlite3 for tests; fields and relationships belong in migrations.
 - Model-like classes should expose explicit Knex query helpers instead of hidden ORM behavior.
+- Auth schema uses `users` and `personal_access_tokens`; access tokens should be stored as hashes.
+- Auth conventions live in `docs/auth.md`; API clients should use bearer tokens.
 - Test conventions live in `docs/testing.md`; tests use SQLite through `NODE_ENV=test`.
 - Auth and service/container features should plug into the same route and exception boundaries.
 - Keep generated JavaScript in `dist/` out of source control.

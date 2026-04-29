@@ -124,6 +124,15 @@ API shape lives in resources.
 Input rules live in requests.
 ```
 
+Auth tables follow the same relationship convention:
+
+```text
+users has many personal_access_tokens
+personal_access_tokens belongs to user
+```
+
+The token table stores `token_hash`, never a raw plain-text token.
+
 ## Model-Like Classes
 
 Keep model-like classes thin and explicit. They should centralize table names and common queries without hiding Knex.
@@ -161,6 +170,15 @@ export class Post {
   }
 }
 ```
+
+Auth model-like classes live under `src/models/`:
+
+```text
+User
+PersonalAccessToken
+```
+
+`User.tokens(userId)` returns a user's personal access tokens. `PersonalAccessToken.user(token)` returns the owning user.
 
 ## Query Builder Usage
 
@@ -224,6 +242,7 @@ The `npm test` script sets `NODE_ENV=test`, and the Post feature tests run migra
 - Use `knex`, `mysql2` for local/production, and `sqlite3` for tests; do not introduce Prisma, TypeORM, or Drizzle without a new decision.
 - Put schema fields and foreign keys in migrations.
 - Put table query helpers in model-like classes.
+- Store only hashed access tokens, not raw bearer tokens.
 - Put request validation in `src/http/requests`.
 - Put response shaping in `src/http/resources`.
 - Prefer explicit query-builder code over hidden ORM behavior.

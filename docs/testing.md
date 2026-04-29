@@ -98,6 +98,7 @@ For each route group, cover:
 - pagination metadata for collection endpoints
 - database-backed create/read behavior where applicable
 - update/delete behavior where applicable
+- model relationship helpers where schema behavior matters
 
 Prefer asserting public API JSON shapes rather than internal implementation details.
 
