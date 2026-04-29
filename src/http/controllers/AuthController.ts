@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { UnauthorizedException } from "@exceptions/UnauthorizedException";
+import { Controller } from "@http/controllers/Controller";
 import { AuthenticatedRequest, LoginRequestData, RegisterRequestData, ValidatedRequest } from "@http/requests";
 import { UserResource } from "@http/resources";
 import { PersonalAccessToken } from "@models/PersonalAccessToken";
@@ -15,8 +16,8 @@ type LoginRequest = ValidatedRequest<{
   body: LoginRequestData;
 }>;
 
-export class AuthController {
-  async register(req: Request, res: Response) {
+export class AuthController extends Controller {
+  register = async (req: Request, res: Response) => {
     const data = (req as RegisterRequest).validated.body;
     const user = await User.create({
       name: data.name,
@@ -31,16 +32,14 @@ export class AuthController {
       token_hash: plainAccessToken.tokenHash,
     });
 
-    res.status(201).json({
-      data: {
-        user: UserResource.make(user).toArray(),
-        token: plainAccessToken.plainTextToken,
-        token_type: "Bearer",
-      },
+    return this.created(res, {
+      user: UserResource.make(user).toArray(),
+      token: plainAccessToken.plainTextToken,
+      token_type: "Bearer",
     });
-  }
+  };
 
-  async login(req: Request, res: Response) {
+  login = async (req: Request, res: Response) => {
     const data = (req as LoginRequest).validated.body;
     const user = await User.findByEmail(data.email);
 
@@ -56,26 +55,24 @@ export class AuthController {
       token_hash: plainAccessToken.tokenHash,
     });
 
-    res.json({
-      data: {
-        user: UserResource.make(user).toArray(),
-        token: plainAccessToken.plainTextToken,
-        token_type: "Bearer",
-      },
+    return this.data(res, {
+      user: UserResource.make(user).toArray(),
+      token: plainAccessToken.plainTextToken,
+      token_type: "Bearer",
     });
-  }
+  };
 
-  async me(req: Request, res: Response) {
+  me = async (req: Request, res: Response) => {
     const { user } = req as AuthenticatedRequest;
 
-    res.json(UserResource.make(user).toResponse());
-  }
+    return this.resource(res, UserResource.make(user));
+  };
 
-  async logout(req: Request, res: Response) {
+  logout = async (req: Request, res: Response) => {
     const { accessToken } = req as AuthenticatedRequest;
 
     await PersonalAccessToken.revoke(accessToken.id);
 
-    res.status(204).send();
-  }
+    return this.noContent(res);
+  };
 }

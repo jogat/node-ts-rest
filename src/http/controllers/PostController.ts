@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Controller } from "@http/controllers/Controller";
 import { AuthenticatedRequest, ListPostsRequestData, StorePostRequestData, UpdatePostRequestData, ValidatedRequest } from "@http/requests";
 import { JsonResource, PostResource } from "@http/resources";
 import { Post, PostRow } from "@models/Post";
@@ -21,19 +22,21 @@ type BoundPostRequest = Request & {
   };
 };
 
-export class PostController {
-  async index(req: Request, res: Response) {
+export class PostController extends Controller {
+  index = async (req: Request, res: Response) => {
     const pagination = (req as IndexPostRequest).validated.query;
     const posts = await Post.paginate(pagination);
 
-    res.json(
-      JsonResource.collection(posts.data, PostResource).toResponse({
+    return this.collection(
+      res,
+      JsonResource.collection(posts.data, PostResource),
+      {
         meta: posts.meta,
-      })
+      }
     );
-  }
+  };
 
-  async store(req: Request, res: Response) {
+  store = async (req: Request, res: Response) => {
     const { user } = req as AuthenticatedRequest;
     const data = (req as StorePostRequest).validated.body;
     const post = await Post.create({
@@ -41,36 +44,40 @@ export class PostController {
       ...data,
     });
 
-    res.status(201).json(
-      PostResource.make(post).toResponse({
+    return this.createdResource(
+      res,
+      PostResource.make(post),
+      {
         message: "Post created.",
-      })
+      }
     );
-  }
+  };
 
-  async show(req: Request, res: Response) {
+  show = async (req: Request, res: Response) => {
     const post = (req as BoundPostRequest).models.post;
 
-    res.json(PostResource.make(post).toResponse());
-  }
+    return this.resource(res, PostResource.make(post));
+  };
 
-  async update(req: Request, res: Response) {
+  update = async (req: Request, res: Response) => {
     const boundPost = (req as BoundPostRequest).models.post;
     const data = (req as UpdatePostRequest).validated.body;
     const post = await Post.update(boundPost.id, data);
 
-    res.json(
-      PostResource.make(post ?? boundPost).toResponse({
+    return this.resource(
+      res,
+      PostResource.make(post ?? boundPost),
+      {
         message: "Post updated.",
-      })
+      }
     );
-  }
+  };
 
-  async destroy(req: Request, res: Response) {
+  destroy = async (req: Request, res: Response) => {
     const post = (req as BoundPostRequest).models.post;
 
     await Post.delete(post.id);
 
-    res.status(204).send();
-  }
+    return this.noContent(res);
+  };
 }

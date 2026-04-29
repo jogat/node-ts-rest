@@ -38,6 +38,7 @@ Defaults are defined in `src/config/app.ts`.
 Database conventions are documented in `docs/database.md`.
 Auth conventions are documented in `docs/auth.md`.
 Authorization conventions are documented in `docs/authorization.md`.
+Controller conventions are documented in `docs/controllers.md`.
 Routing conventions are documented in `docs/routing.md`.
 
 ## Run Locally
@@ -164,6 +165,7 @@ src/
     NotFoundException.ts         404 exception
   http/
     controllers/
+      Controller.ts              Base controller response helpers
       TestController.ts          Example controller
     middleware/
       errorHandler.ts            Express error middleware
@@ -260,10 +262,12 @@ Successful API responses can be shaped with Laravel-like resources under `src/ht
 Resources transform internal data into public JSON response data:
 
 ```ts
-return res.status(201).json(
-  TestResource.make({ name, fruit }).toResponse({
+return this.createdResource(
+  res,
+  TestResource.make({ name, fruit }),
+  {
     message: "Test request validated.",
-  })
+  }
 );
 ```
 
@@ -294,6 +298,8 @@ Collection responses can include pagination metadata:
 ```
 
 Post collections accept `page` and `per_page` query parameters.
+
+Controllers should extend `src/http/controllers/Controller.ts` and use the base response helpers. See `docs/controllers.md`.
 
 ## Database
 

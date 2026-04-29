@@ -84,6 +84,8 @@ When adding a new top-level concern, update both `tsconfig.json` and verify `npm
 ## Conventions For Future Modules
 
 - Controllers should stay thin and return JSON responses through resources when shaping API data.
+- Controllers should extend the base `Controller` and use its response helpers for data, resources, collections, created responses, and no-content responses.
+- Controller actions that use `this` should be arrow properties so Express route callbacks keep the controller instance.
 - Middleware should be exported from `src/http/middleware/index.ts`.
 - Async controllers should be wrapped with `asyncHandler` so errors flow into `errorHandler`.
 - Route model binding should use `bindRouteModel("name", Model)` with model-like classes that expose `find(id)`.
