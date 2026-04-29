@@ -7,8 +7,9 @@ import { ListPostsRequest, LoginRequest, RegisterRequest, StorePostRequest, Test
 import { EventDispatcher } from "@events";
 import { registerEventListeners } from "@listeners";
 import { Post } from "@models/Post";
-import { InMemoryNotificationChannel, Notifier } from "@notifications";
+import { InMemoryNotificationChannel, Notifier, QueuedMailNotificationChannel } from "@notifications";
 import { PostPolicy } from "@policies/PostPolicy";
+import { createQueueDispatcher } from "@queue";
 import { AuthService, PostService, ServiceContainer } from "@services";
 
 const router = Router();
@@ -17,7 +18,9 @@ const protectedRoutes = Router();
 const serviceContainer = new ServiceContainer();
 const eventDispatcher = new EventDispatcher();
 const notificationChannel = new InMemoryNotificationChannel();
-const notifier = new Notifier([notificationChannel]);
+const queueDispatcher = createQueueDispatcher();
+const mailNotificationChannel = new QueuedMailNotificationChannel(queueDispatcher);
+const notifier = new Notifier([notificationChannel, mailNotificationChannel]);
 
 registerEventListeners(eventDispatcher, notifier);
 

@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { InMemoryNotificationChannel, Notification, Notifier } from "@notifications";
+import { InMemoryNotificationChannel, Notification, Notifier, QueuedMailNotificationChannel } from "@notifications";
+import { SEND_MAIL_JOB } from "@jobs";
+import { FakeQueueDispatcher } from "@queue";
 
 type TestUser = {
   id: number;
+  name?: string;
   email: string;
 };
 
@@ -45,5 +48,31 @@ describe("Notifier", () => {
       },
     ]);
     expect(channel.all()[0].sentAt).toBeInstanceOf(Date);
+  });
+
+  it("queues mail notifications for emailable notifiables", async () => {
+    const queue = new FakeQueueDispatcher();
+    const channel = new QueuedMailNotificationChannel(queue);
+
+    await channel.send({ id: 1, name: "Notify User", email: "notify@example.com" }, new TestNotification());
+
+    expect(queue.all()).toEqual([
+      {
+        name: SEND_MAIL_JOB,
+        payload: {
+          to: {
+            name: "Notify User",
+            address: "notify@example.com",
+          },
+          subject: "Test notification",
+          text: "Sent to notify@example.com.",
+          metadata: {
+            notification_type: "test.notification",
+            user_id: 1,
+          },
+        },
+        options: undefined,
+      },
+    ]);
   });
 });
