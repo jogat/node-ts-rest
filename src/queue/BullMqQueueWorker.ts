@@ -3,6 +3,7 @@ import type { WorkerOptions } from "bullmq";
 import { config } from "@config/index";
 import { registerJobs } from "@jobs";
 import type { JobRegistry } from "@jobs/JobRegistry";
+import { registerQueuedEventListeners } from "@listeners";
 import { createMailer } from "@mail";
 
 type QueueJob = {
@@ -28,7 +29,7 @@ export type CreateQueueWorkerOptions = {
 };
 
 export function createQueueWorker(options: CreateQueueWorkerOptions = {}): QueueWorker {
-  const registry = options.registry ?? registerJobs(createMailer());
+  const registry = options.registry ?? registerJobs(createMailer(), registerQueuedEventListeners());
   const WorkerClass = options.WorkerClass ?? Worker;
   const queueName = options.queueName ?? config.queue.name;
   const connection = options.connection ?? config.queue.connection;

@@ -18,9 +18,9 @@ const router = Router();
 const protectedRoutes = Router();
 
 const serviceContainer = new ServiceContainer();
-const eventDispatcher = new EventDispatcher();
 const notificationChannel = new InMemoryNotificationChannel();
 const queueDispatcher = createQueueDispatcher();
+const eventDispatcher = new EventDispatcher(queueDispatcher);
 const mailNotificationChannel = new QueuedMailNotificationChannel(queueDispatcher);
 const notifier = new Notifier([notificationChannel, mailNotificationChannel]);
 
