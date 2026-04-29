@@ -51,6 +51,8 @@
       "@queue": ["src/queue/index.ts"],
       "@queue/*": ["src/queue/*"],
       "@routes/*": ["src/routes/*"],
+      "@schedule": ["src/schedule/index.ts"],
+      "@schedule/*": ["src/schedule/*"],
       "@services": ["src/services/index.ts"],
       "@services/*": ["src/services/*"],
       "@storage": ["src/storage/index.ts"],

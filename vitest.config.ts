@@ -18,6 +18,7 @@ export default defineConfig({
       "@policies": path.resolve(__dirname, "src/policies"),
       "@queue": path.resolve(__dirname, "src/queue"),
       "@routes": path.resolve(__dirname, "src/routes"),
+      "@schedule": path.resolve(__dirname, "src/schedule"),
       "@services": path.resolve(__dirname, "src/services"),
       "@storage": path.resolve(__dirname, "src/storage"),
       "@support": path.resolve(__dirname, "src/support"),

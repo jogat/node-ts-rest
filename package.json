@@ -17,6 +17,8 @@
     "start": "node dist/app.js",
     "queue:work": "ts-node -r tsconfig-paths/register src/worker.ts",
     "queue:work:dist": "node dist/worker.js",
+    "schedule:work": "ts-node -r tsconfig-paths/register src/scheduler.ts",
+    "schedule:work:dist": "node dist/scheduler.js",
     "dev": "nodemon"
   },
   "keywords": [],
@@ -35,6 +37,7 @@
     "knex": "^3.2.9",
     "multer": "^2.1.1",
     "mysql2": "^3.22.3",
+    "node-cron": "^4.2.1",
     "nodemailer": "^8.0.7",
     "zod": "^4.3.6"
   },
