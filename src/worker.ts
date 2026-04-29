@@ -1,30 +1,9 @@
-import { Worker } from "bullmq";
 import { config } from "@config/index";
-import { createMailer } from "@mail";
-import { registerJobs } from "@jobs";
+import { createQueueWorker } from "@queue";
+import type { QueueWorker } from "@queue/BullMqQueueWorker";
 
-export function createWorker(): Worker {
-  const registry = registerJobs(createMailer());
-  const worker = new Worker(
-    config.queue.name,
-    async (job) => {
-      await registry.handle(job.name, job.data);
-    },
-    {
-      connection: config.queue.connection,
-      concurrency: Number(process.env.QUEUE_WORKER_CONCURRENCY || 1),
-    }
-  );
-
-  worker.on("completed", (job) => {
-    console.log(`[queue]: ${job.name}#${job.id} completed`);
-  });
-
-  worker.on("failed", (job, error) => {
-    console.error(`[queue]: ${job?.name ?? "unknown"}#${job?.id ?? "unknown"} failed`, error);
-  });
-
-  return worker;
+export function createWorker(): QueueWorker {
+  return createQueueWorker();
 }
 
 export async function runWorker(): Promise<void> {
