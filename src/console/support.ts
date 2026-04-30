@@ -191,6 +191,7 @@ export function getDoctorChecks(): ProjectCheck[] {
     "src/console/artisan.ts",
     "src/console/commands/HelloCommand.ts",
     "src/console/commands/RoutesCommand.ts",
+    "src/console/commands/UserCommand.ts",
     "src/console/output.ts",
     "src/console/support.ts",
     "src/exceptions/Handler.ts",

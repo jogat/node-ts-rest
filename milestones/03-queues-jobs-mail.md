@@ -33,17 +33,17 @@ Once the API grows, not every side effect should happen during the HTTP request.
 - Nodemailer is the runtime mail transport.
 - `FakeMailer` keeps mail tests independent of SMTP.
 - Notification listeners can queue mail through `QueuedMailNotificationChannel` when the notifiable has an email address.
+- Queue workers, scheduled jobs, and queued event listeners are now tracked in later milestone docs.
 
 ## Pending Work
 
 - Add first-class email template rendering for verification, password reset, and post notification emails.
 - Add product flows for verification and password reset before sending those emails.
 - Add queue dashboards, metrics, and operational monitoring.
-- Add production worker deployment guidance and scaling recommendations.
 - Add dead-letter handling or richer failed-job inspection.
 - Add Redis-backed GitHub Actions integration tests once CI service containers are configured.
-- Add scheduled and repeatable jobs in the scheduled-commands milestone.
-- Keep advanced worker behavior in the queue-workers milestone.
+- Keep more advanced worker behavior in the queue-workers milestone if job types need named pools or stronger lifecycle control.
+- Add delayed job retry policies or job-specific backoff settings only if the mail and listener workloads need them.
 
 ## Done When
 

@@ -129,4 +129,4 @@ export class UserRegisteredNotification implements Notification<UserRow> {
 
 ## Current Boundary
 
-This milestone does not add a notifications table, notification read/unread state, event discovery, wildcard listeners, listener priorities, or user-facing notification endpoints. Those belong in future persistence-backed and framework-polish milestones.
+This milestone does not add a notifications table, notification read/unread state, event discovery, wildcard listeners, listener priorities, or user-facing notification endpoints. Persistent notifications are tracked in milestone 10.

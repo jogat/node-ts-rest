@@ -3,6 +3,7 @@ import { closeConsoleDatabase, getProjectSummary, rollbackMigrations, runMigrati
 import { renderDatabaseStatusReport, renderDoctorReport, renderProjectOverview } from "@console/output";
 import { registerHelloCommand } from "@console/commands/HelloCommand";
 import { registerRoutesCommand } from "@console/commands/RoutesCommand";
+import { registerUserCommand } from "@console/commands/UserCommand";
 
 function buildDatabaseCommand(): Command {
   const database = new Command("db").description("Database maintenance commands");
@@ -75,6 +76,7 @@ export function createArtisanProgram(): Command {
     });
 
   registerRoutesCommand(program);
+  registerUserCommand(program);
 
   program
     .command("doctor")

@@ -33,13 +33,14 @@ Laravel apps often keep controllers thin by moving follow-up work into events an
 - `registerEventListeners` wires the first notification listeners.
 - `Notifier` sends notification objects through configured channels.
 - `InMemoryNotificationChannel` provides the first concrete delivery path without adding persistence.
+- Queued listener support now lives in the later event-listener milestone, alongside the queue-backed worker flow.
 
 ## Pending Work
 
-- Add a database-backed notifications table for durable user notification storage.
-- Add notification read/unread state and user-facing API endpoints.
-- Add queued listeners, retries, and failure handling.
-- Add mail or external delivery channels.
+- Add a database-backed notifications table for durable user notification storage. This is tracked in milestone 10.
+- Add notification read/unread state and user-facing API endpoints. This is tracked in milestone 10.
+- Add notification discovery or registration manifests if the listener count grows.
+- Add broadcast or real-time delivery channels only if the product needs them.
 - Add events for password changes once that workflow exists.
 
 ## Done When

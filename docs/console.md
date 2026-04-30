@@ -17,6 +17,7 @@ npm run artisan -- about
 npm run artisan -- routes
 npm run artisan -- hello
 npm run artisan -- doctor
+npm run artisan -- user create
 npm run artisan -- db status
 npm run artisan -- db migrate
 npm run artisan -- db rollback
@@ -53,6 +54,15 @@ Prints `hello world`.
 ### `doctor`
 
 Checks the expected project files and framework entrypoints.
+
+### `user create`
+
+Creates a login-ready `User` record for auth testing.
+
+- Prompts for `name`, `email`, and `password` when they are not passed as arguments.
+- Prompts for password confirmation before creating the user.
+- Validates the same core constraints used by the auth registration flow.
+- Stores a hashed password so the account can immediately log in through `/v1/auth/login`.
 
 ### `db`
 

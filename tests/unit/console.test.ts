@@ -27,10 +27,13 @@ describe("Console support", () => {
     const program = createArtisanProgram();
     const commandNames = program.commands.map((command) => command.name());
     const dbCommand = program.commands.find((command) => command.name() === "db");
+    const userCommand = program.commands.find((command) => command.name() === "user");
     const databaseCommandNames = dbCommand?.commands.map((command) => command.name()) ?? [];
+    const userCommandNames = userCommand?.commands.map((command) => command.name()) ?? [];
 
-    expect(commandNames).toEqual(expect.arrayContaining(["about", "routes", "hello", "doctor", "db"]));
+    expect(commandNames).toEqual(expect.arrayContaining(["about", "routes", "hello", "doctor", "db", "user"]));
     expect(databaseCommandNames).toEqual(expect.arrayContaining(["status", "migrate", "rollback", "seed"]));
+    expect(userCommandNames).toEqual(expect.arrayContaining(["create"]));
   });
 
   it("checks the console and roadmap files", () => {
