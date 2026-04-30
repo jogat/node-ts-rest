@@ -18,6 +18,7 @@ describe("Post API routes", () => {
 
   beforeEach(async () => {
     await db("posts").del();
+    await db("slugs").del();
     await db("personal_access_tokens").del();
     await db("users").del();
     const user = await User.create({
@@ -115,17 +116,14 @@ describe("Post API routes", () => {
     await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "First",
       body: "First body",
-      slug: "first",
     });
     await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Second",
       body: "Second body",
-      slug: "second",
     });
     await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Third",
       body: "Third body",
-      slug: "third",
     });
 
     const response = await request(app).get("/v1/posts?page=2&per_page=2").set("Authorization", authHeader);
@@ -160,7 +158,6 @@ describe("Post API routes", () => {
     const response = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Hello World",
       body: "First post body",
-      slug: "hello-world",
       published: true,
     });
 
@@ -180,31 +177,27 @@ describe("Post API routes", () => {
     expect(response.body.data.updated_at).toBeNull();
   });
 
-  it("returns a conflict response when creating a post with an existing slug", async () => {
-    await request(app).post("/v1/posts").set("Authorization", authHeader).send({
-      title: "Original",
+  it("generates a unique slug when creating posts with the same title", async () => {
+    const firstResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
+      title: "Duplicate Title",
       body: "Original body",
-      slug: "duplicate-slug",
     });
 
-    const response = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
-      title: "Duplicate",
+    const secondResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
+      title: "Duplicate Title",
       body: "Duplicate body",
-      slug: "duplicate-slug",
     });
 
-    expect(response.status).toBe(409);
-    expect(response.body).toEqual({
-      message: "The slug has already been taken.",
-      status: 409,
-    });
+    expect(firstResponse.status).toBe(201);
+    expect(secondResponse.status).toBe(201);
+    expect(firstResponse.body.data.slug).toBe("duplicate-title");
+    expect(secondResponse.body.data.slug).toBe("duplicate-title-1");
   });
 
   it("returns a post by id", async () => {
     const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Find Me",
       body: "Post lookup body",
-      slug: "find-me",
     });
 
     const response = await request(app).get(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader);
@@ -222,11 +215,31 @@ describe("Post API routes", () => {
     });
   });
 
+  it("returns a post by slug", async () => {
+    const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
+      title: "Slug Lookup",
+      body: "Post lookup body",
+    });
+
+    const response = await request(app).get(`/v1/posts/slug/${createResponse.body.data.slug}`).set("Authorization", authHeader);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      data: {
+        id: createResponse.body.data.id,
+        user_id: authenticatedUserId,
+        title: "Slug Lookup",
+        body: "Post lookup body",
+        slug: createResponse.body.data.slug,
+        published: false,
+      },
+    });
+  });
+
   it("returns validation errors for invalid post data", async () => {
     const response = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "",
       body: "",
-      slug: "",
     });
 
     expect(response.status).toBe(422);
@@ -236,7 +249,6 @@ describe("Post API routes", () => {
       errors: {
         title: ["Title is required"],
         body: ["Body is required"],
-        slug: ["Slug is required"],
       },
     });
   });
@@ -245,7 +257,6 @@ describe("Post API routes", () => {
     const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Original Title",
       body: "Original body",
-      slug: "original-title",
     });
 
     const response = await request(app)
@@ -275,7 +286,6 @@ describe("Post API routes", () => {
     const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Needs Changes",
       body: "Body",
-      slug: "needs-changes",
     });
 
     const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader).send({});
@@ -294,7 +304,6 @@ describe("Post API routes", () => {
     const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Invalid Update",
       body: "Body",
-      slug: "invalid-update",
     });
 
     const response = await request(app).patch(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader).send({
@@ -363,7 +372,6 @@ describe("Post API routes", () => {
     const createResponse = await request(app).post("/v1/posts").set("Authorization", authHeader).send({
       title: "Delete Me",
       body: "Delete body",
-      slug: "delete-me",
     });
 
     const deleteResponse = await request(app).delete(`/v1/posts/${createResponse.body.data.id}`).set("Authorization", authHeader);

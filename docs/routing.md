@@ -15,6 +15,18 @@ protectedRoutes.get("/posts", validate(ListPostsRequest), asyncHandler(postContr
 router.use(protectedRoutes);
 ```
 
+## Scoped Route Modules
+
+Keep v1 routes split by concern so each module owns a small area of the API:
+
+```text
+src/routes/api/v1/auth.ts
+src/routes/api/v1/posts.ts
+src/routes/api/v1/index.ts
+```
+
+Use `src/routes/api/v1/index.ts` as the composition point that wires shared controllers and mounts the scoped route registrars. This keeps auth and post routes isolated without changing public API paths.
+
 ## Middleware Order
 
 Recommended order for protected model routes:
@@ -52,6 +64,22 @@ Invalid params and missing records return `404`, matching Laravel-style model bi
 }
 ```
 
+## Slug Binding
+
+Use `bindRouteSlugModel("name", Model)` when the route should resolve a record by a slug instead of a numeric id:
+
+```ts
+router.get("/posts/slug/:slug", bindRouteSlugModel("post", Post), asyncHandler(postController.show));
+```
+
+The middleware reuses the same `req.models.post` storage pattern, so controllers can stay unchanged. It is meant to be reusable for any model that exposes:
+
+```ts
+static findBySlug(slug: string): Promise<Row | undefined>
+```
+
+This keeps the route binding pattern consistent while allowing future slug-based model lookups.
+
 ## Route Params
 
 Reusable route param helpers live in:
@@ -80,5 +108,6 @@ explicit request validation invalid param -> 422
 
 - Keep route groups Express-native with `Router`.
 - Prefer `bindRouteModel` for routes that load database records.
+- Prefer `bindRouteSlugModel` for slug-based lookups that should still populate `req.models`.
 - Reuse `routeParams` helpers in request schemas.
 - Preserve middleware order when combining auth, model binding, authorization, validation, and controllers.

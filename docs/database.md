@@ -143,6 +143,9 @@ personal_access_tokens belongs to user
 The token table stores `token_hash`, never a raw plain-text token.
 
 Post ownership is represented by `posts.user_id`, which references `users.id`.
+Generated post slugs are stored on `posts.slug` and mirrored in the morphable `slugs` table via `sluggable_model_class` and `sluggable_model_id`.
+Prefer `PostService.create` or `postFactory.create` for new posts so both tables stay synchronized.
+The slug table is the canonical mapping for slug ownership and uses `sluggable_model_class + sluggable_model_id` for lookup, with `slug` remaining the public value returned by `PostResource`.
 
 ## Model-Like Classes
 
@@ -187,9 +190,11 @@ Auth model-like classes live under `src/models/`:
 ```text
 User
 PersonalAccessToken
+Slug
 ```
 
 `User.tokens(userId)` returns a user's personal access tokens. `PersonalAccessToken.user(token)` returns the owning user.
+`Slug.findByModel(className, modelId)` returns the stored slug row for a specific model, and `Slug.findBySlug(slug)` helps detect collisions.
 
 ## Query Builder Usage
 
@@ -225,6 +230,7 @@ Current mapped conflicts:
 ```text
 users.email -> The email has already been taken.
 posts.slug -> The slug has already been taken.
+slugs.slug -> The slug has already been taken.
 personal_access_tokens.token_hash -> The token has already been taken.
 ```
 
@@ -248,6 +254,7 @@ import type { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
   await knex("posts").del();
+  await knex("slugs").del();
   await knex("posts").insert([
     {
       title: "Hello",

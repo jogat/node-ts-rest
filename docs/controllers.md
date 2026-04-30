@@ -86,7 +86,7 @@ Authenticated request data lives on `req.user` and `req.accessToken` after the `
 const { user } = req as AuthenticatedRequest;
 ```
 
-Bound route models live on `req.models` after `bindRouteModel` runs:
+Bound route models live on `req.models` after `bindRouteModel` or `bindRouteSlugModel` runs:
 
 ```ts
 const post = (req as BoundPostRequest).models.post;

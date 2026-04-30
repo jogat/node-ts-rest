@@ -1,18 +1,50 @@
+import { db } from "@database/connection";
 import { EventDispatcher, PostCreated, PostUpdated } from "@events";
 import { Post, PostRow, CreatePostData, UpdatePostData, PaginationInput, PaginatedResult } from "@models/Post";
 import type { UserRow } from "@models/User";
+import { SlugService } from "@services/SlugService";
 
 export class PostService {
-  constructor(private readonly events = new EventDispatcher()) {}
+  constructor(
+    private readonly events = new EventDispatcher(),
+    private readonly slugService = new SlugService()
+  ) {}
 
   list(pagination: PaginationInput): Promise<PaginatedResult<PostRow>> {
     return Post.paginate(pagination);
   }
 
-  async create(user: UserRow, data: Omit<CreatePostData, "user_id">): Promise<PostRow> {
-    const post = await Post.create({
-      user_id: user.id,
-      ...data,
+  async create(user: UserRow, data: Omit<CreatePostData, "user_id" | "slug">): Promise<PostRow> {
+    const post = await db.transaction(async (trx) => {
+      const slug = await this.slugService.generateSlug(
+        {
+          components: [data.title],
+          fallback: "post",
+        },
+        trx
+      );
+
+      const createdPost = await Post.create(
+        {
+          user_id: user.id,
+          title: data.title,
+          body: data.body,
+          slug,
+          published: data.published,
+        },
+        trx
+      );
+
+      await this.slugService.persistSlug(
+        {
+          sluggable_model_id: createdPost.id,
+          sluggable_model_class: Post.name,
+          slug,
+        },
+        trx
+      );
+
+      return createdPost;
     });
 
     await this.events.dispatch(new PostCreated(post, user));

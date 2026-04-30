@@ -1,5 +1,5 @@
 import "dotenv/config";
-import "tsconfig-paths/register";
+import "tsconfig-paths/register.js";
 import type { Knex } from "knex";
 
 type DatabaseEnvironment = "development" | "test" | "production";

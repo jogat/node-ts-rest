@@ -1,11 +1,12 @@
+import type { Knex } from "knex";
 import { db } from "@database/connection";
+import type { SlugInterface } from "@models/SlugInterface";
 
-export type PostRow = {
+export type PostRow = SlugInterface & {
   id: number;
   user_id: number | null;
   title: string;
   body: string;
-  slug: string;
   published: boolean | number;
   created_at: Date | string;
   updated_at: Date | string | null;
@@ -41,20 +42,20 @@ export type PaginatedResult<T> = {
 export class Post {
   static table = "posts";
 
-  static query() {
-    return db<PostRow>(Post.table);
+  static query(connection: Knex | Knex.Transaction = db) {
+    return connection<PostRow>(Post.table);
   }
 
-  static all() {
-    return Post.query().select("*").orderBy("created_at", "desc").orderBy("id", "desc");
+  static all(connection: Knex | Knex.Transaction = db) {
+    return Post.query(connection).select("*").orderBy("created_at", "desc").orderBy("id", "desc");
   }
 
-  static async paginate(input: PaginationInput): Promise<PaginatedResult<PostRow>> {
+  static async paginate(input: PaginationInput, connection: Knex | Knex.Transaction = db): Promise<PaginatedResult<PostRow>> {
     const page = input.page;
     const perPage = input.per_page;
     const offset = (page - 1) * perPage;
-    const total = await Post.count();
-    const data = await Post.query().select("*").orderBy("created_at", "desc").orderBy("id", "desc").limit(perPage).offset(offset);
+    const total = await Post.count(connection);
+    const data = await Post.query(connection).select("*").orderBy("created_at", "desc").orderBy("id", "desc").limit(perPage).offset(offset);
     const from = total === 0 || data.length === 0 ? null : offset + 1;
     const to = total === 0 || data.length === 0 ? null : offset + data.length;
 
@@ -71,18 +72,22 @@ export class Post {
     };
   }
 
-  static async count(): Promise<number> {
-    const result = await Post.query().count<{ total: number | string }>("id as total").first();
+  static async count(connection: Knex | Knex.Transaction = db): Promise<number> {
+    const result = await Post.query(connection).count<{ total: number | string }>("id as total").first();
 
     return Number(result?.total ?? 0);
   }
 
-  static find(id: number) {
-    return Post.query().where({ id }).first();
+  static find(id: number, connection: Knex | Knex.Transaction = db) {
+    return Post.query(connection).where({ id }).first();
   }
 
-  static async create(data: CreatePostData): Promise<PostRow> {
-    const [id] = await Post.query().insert({
+  static findBySlug(slug: string, connection: Knex | Knex.Transaction = db) {
+    return Post.query(connection).where({ slug }).first();
+  }
+
+  static async create(data: CreatePostData, connection: Knex | Knex.Transaction = db): Promise<PostRow> {
+    const [id] = await Post.query(connection).insert({
       user_id: data.user_id,
       title: data.title,
       body: data.body,
@@ -90,7 +95,7 @@ export class Post {
       published: data.published ?? false,
     });
 
-    const post = await Post.find(Number(id));
+    const post = await Post.find(Number(id), connection);
 
     if (!post) {
       throw new Error("Post was not created.");
@@ -99,18 +104,18 @@ export class Post {
     return post;
   }
 
-  static async update(id: number, data: UpdatePostData): Promise<PostRow | undefined> {
+  static async update(id: number, data: UpdatePostData, connection: Knex | Knex.Transaction = db): Promise<PostRow | undefined> {
     const changes: Record<string, unknown> = {
       ...data,
-      updated_at: db.fn.now(),
+      updated_at: connection.fn.now(),
     };
 
-    await Post.query().where({ id }).update(changes);
+    await Post.query(connection).where({ id }).update(changes);
 
-    return Post.find(id);
+    return Post.find(id, connection);
   }
 
-  static delete(id: number) {
-    return Post.query().where({ id }).delete();
+  static delete(id: number, connection: Knex | Knex.Transaction = db) {
+    return Post.query(connection).where({ id }).delete();
   }
 }

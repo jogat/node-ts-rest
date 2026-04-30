@@ -1,7 +1,9 @@
 export { asyncHandler } from "@http/middleware/asyncHandler";
 export { auth } from "@http/middleware/auth";
 export { authorize } from "@http/middleware/authorize";
+export { bindRouteModelBy } from "@http/middleware/bindRouteModel";
 export { bindRouteModel } from "@http/middleware/bindRouteModel";
+export { bindRouteSlugModel } from "@http/middleware/bindRouteModel";
 export { errorHandler } from "@http/middleware/errorHandler";
 export { notFound } from "@http/middleware/notFound";
 export { uploadSingle, validateUploadedFile } from "@http/middleware/upload";

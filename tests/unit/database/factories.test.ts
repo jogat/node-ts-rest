@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { accessTokenFactory, postFactory, userFactory } from "@database/factories";
 import { closeDatabaseConnection, db } from "@database/connection";
 import { PersonalAccessToken } from "@models/PersonalAccessToken";
-import { Post } from "@models/Post";
+import { Slug } from "@models/Slug";
 import { User } from "@models/User";
 import { hashToken } from "@support/hashToken";
 import { verifyPassword } from "@support/password";
@@ -14,6 +14,7 @@ describe("database factories", () => {
 
   beforeEach(async () => {
     await db("posts").del();
+    await db("slugs").del();
     await db("personal_access_tokens").del();
     await db("users").del();
   });
@@ -51,7 +52,6 @@ describe("database factories", () => {
     const post = await postFactory.create(
       {
         title: "Factory Post",
-        slug: "factory-post",
       },
       {
         user,
@@ -61,6 +61,13 @@ describe("database factories", () => {
     expect(post).toMatchObject({
       user_id: user.id,
       title: "Factory Post",
+      slug: "factory-post",
+    });
+
+    const slug = await Slug.findByModel("Post", post.id);
+    expect(slug).toMatchObject({
+      sluggable_model_id: post.id,
+      sluggable_model_class: "Post",
       slug: "factory-post",
     });
   });

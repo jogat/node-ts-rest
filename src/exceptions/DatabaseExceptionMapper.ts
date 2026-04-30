@@ -10,6 +10,7 @@ type DatabaseError = Error & {
 const uniqueMessages: Record<string, string> = {
   "users.email": "The email has already been taken.",
   "posts.slug": "The slug has already been taken.",
+  "slugs.slug": "The slug has already been taken.",
   "personal_access_tokens.token_hash": "The token has already been taken.",
 };
 
@@ -38,6 +39,10 @@ export class DatabaseExceptionMapper {
 
       if (message.includes("posts.slug") || message.includes("posts_slug_unique") || message.includes("'slug'")) {
         return "posts.slug";
+      }
+
+      if (message.includes("slugs.slug") || message.includes("slugs_slug_unique")) {
+        return "slugs.slug";
       }
 
       if (

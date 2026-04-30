@@ -3,6 +3,7 @@ import { PostService } from "@services/PostService";
 import { closeDatabaseConnection, db } from "@database/connection";
 import { EventDispatcher, PostCreated, PostUpdated } from "@events";
 import { Post } from "@models/Post";
+import { Slug } from "@models/Slug";
 import { User } from "@models/User";
 import { hashPassword } from "@support/password";
 
@@ -15,6 +16,7 @@ describe("PostService", () => {
 
   beforeEach(async () => {
     await db("posts").del();
+    await db("slugs").del();
     await db("personal_access_tokens").del();
     await db("users").del();
   });
@@ -33,7 +35,6 @@ describe("PostService", () => {
     const post = await postService.create(user, {
       title: "Service Post",
       body: "Post body content.",
-      slug: "service-post",
       published: true,
     });
 
@@ -42,6 +43,13 @@ describe("PostService", () => {
       title: "Service Post",
       slug: "service-post",
       published: 1,
+    });
+
+    const slug = await Slug.findByModel("Post", post.id);
+    expect(slug).toMatchObject({
+      sluggable_model_id: post.id,
+      sluggable_model_class: "Post",
+      slug: "service-post",
     });
   });
 
@@ -62,7 +70,6 @@ describe("PostService", () => {
     await service.create(user, {
       title: "Event Post",
       body: "Event body.",
-      slug: "event-post",
     });
 
     expect(handled).toHaveLength(1);
@@ -81,8 +88,8 @@ describe("PostService", () => {
     });
 
     await Promise.all([
-      postService.create(user, { title: "Post A", body: "A body.", slug: "post-a" }),
-      postService.create(user, { title: "Post B", body: "B body.", slug: "post-b" }),
+      postService.create(user, { title: "Post A", body: "A body." }),
+      postService.create(user, { title: "Post B", body: "B body." }),
     ]);
 
     const result = await postService.list({ page: 1, per_page: 10 });
@@ -106,7 +113,6 @@ describe("PostService", () => {
     const post = await postService.create(user, {
       title: "Old Title",
       body: "Old body.",
-      slug: "old-title",
     });
 
     const updated = await postService.update(post, {
@@ -134,7 +140,6 @@ describe("PostService", () => {
     const post = await service.create(user, {
       title: "Before Event",
       body: "Before body.",
-      slug: "before-event",
     });
 
     events.listen(PostUpdated, (event) => {
@@ -163,7 +168,6 @@ describe("PostService", () => {
     const post = await postService.create(user, {
       title: "Delete Me",
       body: "Body content.",
-      slug: "delete-me",
     });
 
     await postService.delete(post);

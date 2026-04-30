@@ -1,9 +1,11 @@
 import { faker } from "@faker-js/faker";
 import { Factory } from "fishery";
-import { Post, PostRow } from "@models/Post";
+import { PostRow } from "@models/Post";
 import type { CreatePostData } from "@models/Post";
 import type { UserRow } from "@models/User";
 import { userFactory } from "@database/factories/UserFactory";
+import { PostService } from "@services/PostService";
+import { User } from "@models/User";
 
 type PostFactoryTransientParams = {
   user?: UserRow;
@@ -31,15 +33,24 @@ export const postFactory = {
   },
 
   async create(overrides: Partial<CreatePostData> = {}, transient: PostFactoryTransientParams = {}): Promise<PostRow> {
-    const user = transient.user ?? (overrides.user_id ? undefined : await userFactory.create());
+    const user = transient.user ?? (overrides.user_id ? await User.find(overrides.user_id) : await userFactory.create());
+
+    if (!user) {
+      throw new Error("Post owner was not found.");
+    }
+
     const data = this.build(
       {
         ...overrides,
-        user_id: overrides.user_id ?? user!.id,
+        user_id: overrides.user_id ?? user.id,
       },
       transient
     );
 
-    return Post.create(data);
+    return new PostService().create(user, {
+      title: data.title,
+      body: data.body,
+      published: data.published,
+    });
   },
 };

@@ -13,6 +13,7 @@ describe("development seeder", () => {
 
   beforeEach(async () => {
     await db("posts").del();
+    await db("slugs").del();
     await db("personal_access_tokens").del();
     await db("users").del();
   });
