@@ -17,7 +17,7 @@ npm run artisan -- about
 npm run artisan -- routes
 npm run artisan -- hello
 npm run artisan -- doctor
-npm run artisan -- user create
+npm run user:create
 npm run artisan -- db status
 npm run artisan -- db migrate
 npm run artisan -- db rollback
@@ -55,7 +55,7 @@ Prints `hello world`.
 
 Checks the expected project files and framework entrypoints.
 
-### `user create`
+### `user:create`
 
 Creates a login-ready `User` record for auth testing.
 

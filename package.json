@@ -7,6 +7,7 @@
     "build:bundle": "node scripts/build-production-bundles.js",
     "build:prod": "npm run build && npm run build:bundle",
     "artisan": "ts-node -r tsconfig-paths/register src/console/artisan.ts",
+    "user:create": "ts-node -r tsconfig-paths/register src/console/artisan.ts user create",
     "boost": "ts-node -r tsconfig-paths/register scripts/boost.ts about",
     "boost:doctor": "ts-node -r tsconfig-paths/register scripts/boost.ts doctor",
     "boost:routes": "ts-node -r tsconfig-paths/register scripts/boost.ts routes",

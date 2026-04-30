@@ -21,6 +21,7 @@ describe("Console support", () => {
     expect(summary.structure).toEqual(expect.arrayContaining([expect.stringContaining("src/console")]));
     expect(summary.aliases).toEqual(expect.arrayContaining([expect.stringContaining("@console/*")]));
     expect(summary.commands).toEqual(expect.arrayContaining([expect.stringContaining("artisan:")]));
+    expect(summary.commands).toEqual(expect.arrayContaining([expect.stringContaining("user:create:")]));
   });
 
   it("registers the artisan command tree", () => {
