@@ -41,3 +41,4 @@ Next milestones:
 11. [Caching and optimization](./11-caching-and-optimization.md)
 12. [Maintenance mode and health](./12-maintenance-mode-and-health.md)
 13. [Application bootstrapping and service providers](./13-application-bootstrapping-and-service-providers.md)
+14. [Laravel-inspired pipelines](./14-laravel-inspired-pipelines.md)

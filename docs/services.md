@@ -6,6 +6,8 @@ This project uses a lightweight application service layer to keep controllers th
 
 Service classes are responsible for application-specific workflows that involve one or more models or shared domain logic.
 
+For larger workflows with several ordered stages, use the planned pipeline layer from `milestones/14-laravel-inspired-pipelines.md` and keep services focused on cohesive business operations.
+
 Controllers should not implement business rules directly. Instead they should:
 
 - read validated request data
@@ -17,6 +19,8 @@ Controllers should not implement business rules directly. Instead they should:
 
 - `AuthService` handles registration, login, and logout workflows.
 - `PostService` handles listing, creating, updating, and deleting posts.
+
+Pipeline usage and the planned local implementation are documented in `docs/pipelines.md`.
 
 ## Dependency container
 
@@ -60,3 +64,4 @@ const postController = new PostController(serviceContainer.resolve(PostService))
 
 Keep authorization in middleware and route policy checks.
 Keep response shaping in resources and controller helpers.
+Use pipelines when a service workflow grows into an ordered, stage-based process with shared mutable payload state.

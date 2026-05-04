@@ -44,6 +44,8 @@ await queue.dispatch("mail.send", {
 
 The current concrete job is `mail.send`, handled by `SendMailJob`.
 
+The planned pipelines milestone adds a `pipeline.run` job. That job should receive a named pipeline and JSON-compatible payload data, then execute the entire pipeline inside one queued job through the existing `JobRegistry`.
+
 ## Writing Jobs
 
 Job handlers implement `JobHandler<TPayload>` and are registered in the job registry:
@@ -71,6 +73,8 @@ npm run queue:work:dist
 The worker listens on the configured queue, logs completed and failed jobs, and closes cleanly on `SIGINT` or `SIGTERM`.
 
 Internally, `src/worker.ts` calls `createQueueWorker()`, which creates a BullMQ `Worker` for the configured queue. Each BullMQ job is resolved by name through `JobRegistry`, so every process that can execute jobs must register the same handlers as the dispatcher expects.
+
+Pipeline jobs should follow that same path: dispatch through `QueueDispatcher`, register `pipeline.run` from the shared job registration function, and let workers resolve it through `JobRegistry`.
 
 ## Retry and Failure Behavior
 

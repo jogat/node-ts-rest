@@ -187,6 +187,7 @@ export function getDoctorChecks(): ProjectCheck[] {
     "tsconfig.json",
     "docs/console.md",
     "milestones/README.md",
+    "milestones/14-laravel-inspired-pipelines.md",
     "src/app/Server.ts",
     "src/console/artisan.ts",
     "src/console/commands/HelloCommand.ts",

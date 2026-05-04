@@ -49,6 +49,7 @@ describe("Console support", () => {
         "src/console/support.ts",
         "docs/console.md",
         "milestones/README.md",
+        "milestones/14-laravel-inspired-pipelines.md",
       ])
     );
   });

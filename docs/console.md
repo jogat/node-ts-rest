@@ -73,6 +73,17 @@ Provides database maintenance commands backed by the existing Knex configuration
 - `rollback`
 - `seed`
 
+## Planned Commands
+
+### `pipeline`
+
+Planned by `milestones/14-laravel-inspired-pipelines.md`. The first supported subcommand should be `pipeline demo`, with an optional `--queued` flag to dispatch the demo pipeline through the queue:
+
+```bash
+npm run artisan -- pipeline demo
+npm run artisan -- pipeline demo --queued
+```
+
 ## Adding A New Command
 
 1. Create a new file under `src/console/commands/`.
@@ -100,4 +111,4 @@ export function registerHelloCommand(program: Command): void {
 
 - `boost` remains as a compatibility wrapper around the shared console output.
 - The console layer is additive; existing database scripts remain available.
-- Future milestones for scheduled commands, queue workers, custom listeners, and production binaries are tracked under `milestones/`.
+- Future milestones for scheduled commands, queue workers, custom listeners, production binaries, and pipelines are tracked under `milestones/`.
